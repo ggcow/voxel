@@ -6,7 +6,6 @@
 #include "event.h"
 #include "map.h"
 
-
 #include "opengl.h"
 
 
@@ -17,27 +16,24 @@ struct renderer_t {
 	GLuint vbo;
 	GLuint ebo;
 
-	GLint *buffer;
-	u64 buffer_size;
-	u64 buffer_index;
+	GLfloat *buffer;
+	u32 buffer_size;
+	u32 buffer_index;
 	GLuint *indices;
-	u64 indices_size;
-	u64 indices_index;
-
-	struct draw_thread_data_t *draw_thread_data;
-	pthread_mutex_t *working_mutex;
-	pthread_mutex_t *progress_mutex;
+	u32 indices_size;
+	u32 indices_index;
 };
 
 
 
 struct renderer_t * renderer_create(struct map_t *map);
 
-
+static bool _setup(struct renderer_t *renderer, struct map_t *map);
 
 void renderer_destroy(struct renderer_t *renderer);
-void renderer_empty_buffer(struct renderer_t *renderer);
+
 void renderer_set_clear_color(struct renderer_t *renderer, f32 r, f32 g, f32 b, f32 a);
-void renderer_draw(struct renderer_t *renderer, struct map_t *map, struct player_t *player, struct window_t *window, u32 width, u32 height);
+
+void renderer_draw(struct renderer_t *renderer, struct map_t *map, struct player_t *player, u32 width, u32 height);
 
 #endif

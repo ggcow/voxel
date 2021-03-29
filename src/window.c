@@ -15,20 +15,16 @@ void _update_metrics(struct window_t *window) {
 		(i32 *)&window->height
 	);
 
-	window->time_s = timer_time_s();
 	window->time_ms = timer_time_ms();
 	u64 time = timer_time_us();
 	window->time_delta = time - window->time_us;
-
-	if (log_real()) {
-		fps += (int)(1000000/(double)window->time_delta);
-		fpscount++;
-		if (fpscount == 10) {
-			log_command("20D");
-			info("FPS : %u", fps/fpscount);
-			fpscount=0;
-			fps=0;
-		}
+	fps += (int)(1000000/(double)window->time_delta);
+	fpscount++;
+	if (fpscount == 10) {
+		info("FPS : %u\n", fps/fpscount);
+		log_command("A");
+		fpscount=0;
+		fps=0;
 	}
 
 	window->time_us = time;
@@ -50,12 +46,6 @@ window_create(u32 width, u32 height)
 			log_debug("SDL initialized");
 		}
 	}
-
-	SDL_DisplayMode DM;
-	SDL_GetCurrentDisplayMode(0, &DM);
-
-	width = (u32)DM.w;
-	height = (u32)DM.h;log_error("%u %u", width, height);
 
 	SDL_GL_SetAttribute(SDL_GL_RED_SIZE, 8);
 	SDL_GL_SetAttribute(SDL_GL_GREEN_SIZE, 8);
@@ -87,6 +77,7 @@ window_create(u32 width, u32 height)
 	window->gl_context = SDL_GL_CreateContext(window->sdl_window);
 	if (window->gl_context == NULL) {
 		log_error("OpenGL context creation failed: %s", SDL_GetError());
+
 		deallocate(window);
 		return NULL;
 	} else {

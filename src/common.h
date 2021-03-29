@@ -1,9 +1,9 @@
 #ifndef COMMON_H
 #define COMMON_H
 
-// #ifndef __STDC_IEC_559__
-// #error "Requires IEEE 754 floating point!"
-// #endif
+#ifndef __STDC_IEC_559__
+#error "Requires IEEE 754 floating point!"
+#endif
 
 #include <stddef.h>
 #include <stdint.h>

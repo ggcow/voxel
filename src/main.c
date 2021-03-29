@@ -8,13 +8,12 @@
 #include "cube.h"
 
 
-#define WIDTH 1920
-#define HEIGHT 1080   
+#define WIDTH 955
+#define HEIGHT 1020
 
- 
+
 int main(int argc, char *argv[])
 {
-	log_command("?25l");
 	log_command("2J");
 	log_command("H");
 
@@ -64,7 +63,7 @@ int main(int argc, char *argv[])
 	while (!window->close_requested) {
 		window_poll_events(window);
 		control_move(player, event_data->keys, (f32)window_get_time_delta(window)/1000000);
-		renderer_draw(renderer, map, player, window, WIDTH, HEIGHT);
+		renderer_draw(renderer, map, player, WIDTH, HEIGHT);
 		window_swap(window);
 	}
 

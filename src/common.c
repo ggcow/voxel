@@ -13,8 +13,7 @@ _allocate(const char *filename, u32 line, usize size, usize count)
 	void *pointer = calloc(count, size);
 
 	if (pointer == NULL) {
-		log_error("Allocation failed in %s:%d (%f GiB)", filename, line, ((double)(size*count)/1073741824));
-		exit(1);
+		log_error("Allocation failed in %s:%d", filename, line);
 	}
 
 	return pointer;
@@ -25,15 +24,11 @@ _reallocate(const char *filename, u32 line, void *pointer, usize size, usize cou
 {
 	if (pointer == NULL) {
 		log_warning("Trying to reallocate NULL pointer in %s:%d", filename, line);
-		exit(1);
-	}
-	pointer = realloc(pointer, size * count);
-	if (pointer == NULL) {
-		log_error("Reallocation failed in %s:%d (%f GiB)", filename, line, ((double)(size*count)/1073741824));
-		exit(1);
+
+		return allocate(size, count);
 	}
 
-	return pointer;
+	return realloc(pointer, size * count);
 }
 
 void

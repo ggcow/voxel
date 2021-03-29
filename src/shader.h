@@ -2,8 +2,6 @@
 #define SHADER_H
 
 #include "common.h"
-
-
 #include "opengl.h"
 
 

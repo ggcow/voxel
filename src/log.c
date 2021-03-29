@@ -84,7 +84,3 @@ void log_command(const char *cmd) {
 	}
 }
 
-bool log_real(void) {
-	return isatty(STDERR_FILENO);
-}
-

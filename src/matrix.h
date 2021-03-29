@@ -19,7 +19,13 @@ void _matrix_translation(const f32 *t, f32 *matrix);
 
 void _matrix_lookAt(f32 *position, f32 *center, f32 *up, f32 *out);
 
+static f32 _abs(f32 x);
 
+static void _normalize(f32 *x);
+
+static f32 _dot(f32 *x, f32 *y);
+
+static void _cross(f32 *x, f32 *y, f32 *cross);
 
 void _matrix_display(f32 *m);
 

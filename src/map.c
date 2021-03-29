@@ -1,20 +1,15 @@
 #include "map.h"
 #include <math.h>
 #include <stdlib.h>
-#include <time.h>
 
-#define PROGRESS_BAR 0
 
-static i32 _equation(i32 x, i32 y, f64 t);
-static void _check_map_size(struct map_t *map, usize added_size);
-
-static i32
-_equation(i32 x, i32 y, f64 t)
-{
-	f64 h = sin(3.14/2)*20*cos((sqrt(sqrt(x*x+y*y))-t*2));
-	return (i32)h;
+bool
+_equation(f32 x, f32 y, f32 z) {
+	//f32 e = ((x*x+y*y-0.85*0.85)*(x*x+y*y-0.85*0.85)+(z*z-1)*(z*z-1))*((z*z+y*y-0.85*0.85)*(z*z+y*y-0.85*0.85)+(x*x-1)*(x*x-1))*((x*x+z*z-0.85*0.85)*(x*x+z*z-0.85*0.85)+(y*y-1)*(y*y-1));
+	
+	f32 e = x*x+y*y+z*z;
+	return fabsf(e) < 1.0f;
 }
-
 
 struct map_t *
 map_create(void)
@@ -23,25 +18,17 @@ map_create(void)
 
 	map->size=1024;
 
-	int taille = 100;
+	map_load(map);
 
-	taille=taille*2+1;
-	map->width = taille;
-	map->length = taille;
-	map->height = 41;
+	if (map->cubes == NULL) {
+		log_error("Cannot load map");
+		return NULL;
+	}
 
-	map->m_size = map->width;
-	map->m_size*=map->length;
-	map->m_size*=map->height;
-
-	map->cubes = allocate(sizeof(struct cube_t), map->size);
-	map->m = allocate(sizeof(u64), map->m_size);
-
-	map_load(map, 0);
 
 	// log_debug("MAP index : %u", map->index);
 	// log_debug("xmin : %d; xmax : %d ; ymin : %d ; ymax : %d ; zmin : %d ; zmax : %d",
-	// 	map->xmin, map->xmax, map->ymin, map->ymax, map->zmin, map->zmax);
+		// map->xmin, map->xmax, map->ymin, map->ymax, map->zmin, map->zmax);
 
 	log_debug("Map created");
 	return map;
@@ -51,95 +38,60 @@ void
 map_destroy(struct map_t *map)
 {
 	deallocate(map->cubes);
-	deallocate(map->m);
 	deallocate(map);
 	log_debug("Map destroyed");
 }
 
 void
-map_empty_cubes(struct map_t *map)
+map_load(struct map_t *map)
 {
-	map->index=1;
-}
+	map->cubes = allocate(sizeof(struct cube_t), map->size);
+	map->index = 1;
+	int taille = 50;
+	map->width = taille+1;
+	map->length = taille+1;
+	map->height = taille+1;
+	f32 e = 1.0f;
 
-u64
-_offset(i32 x, i32 y, i32 z, struct map_t *map)
-{ 
-	u64 result = 1;
-	x+=(i32)map->width/2;
-	y+=(i32)map->height/2;
-	z+=(i32)map->length/2;
+	map->map = allocate(sizeof(u32), map->width*map->length*map->height);
 
-	result*=z;
-	result*=map->height;
-	result*=map->width;
-
-	result+=y*map->width;
-
-	result+=x;
-    return result;
-}
-
-void
-map_load(struct map_t *map, f64 time)
-{
-	i32 fill =10;
-	
-	map_empty_cubes(map);
-	
-	
 	i32 width_2 = (i32)map->width/2;
 	i32 length_2 = (i32)map->length/2;
 	i32 height_2 = (i32)map->height/2;
 
-	if (PROGRESS_BAR) {
-		info(log_real()?"Loading map : [          ]":"Loading map : [");
-    	log_command("11D");
-    }
+	_check_map_size(map, 1+(u32)(map->height*map->width*map->length));
 
-	u64 total_size = map->width;
-	u64 step_size= total_size/10;
-	u64 local_count_max = step_size;
-	u64 count = 0;
-
-    u64 reported_count = 0;
-    u64 local_count = 0;
+	int loading = 0;
 
 	for(int i=-width_2; i<=width_2; i++) {
 
-		if (local_count++ >= local_count_max-1 && PROGRESS_BAR) {
-			count += local_count_max;
-      		local_count = 0;
-		}
-
-		if (count - reported_count >= step_size && PROGRESS_BAR) {
-			fprintf(stderr, "#");
-			reported_count = count;
+		if ((10.0f*(i+width_2)/(int)map->width) > loading) {
+			loading++;
+			log_command("A");
+			log_command("2K");
+			info("Loading map : [");
+			for (int j=0; j<10; j++) {
+				if (j<loading) {
+					fprintf(stderr, "#");
+				} else {
+					fprintf(stderr, " ");
+				}
+			}
+			fprintf(stderr, "]\n");
 		}
 
 		for(int j=-length_2; j<=length_2; j++) {
-			i32 y = _equation(i,j,time);
-			y=abs(y)<=height_2?y:0; 
-
-			_check_map_size(map, (usize)(map->height));
-
-			for (int k=-height_2; k<=height_2; k++) {
-				
-				if (((k<=y && k+fill>=y) || (k<=y && fill==-1)) && ((i != 0 && j != 0) || k == y)) {
+			for(int k=-height_2; k<=height_2; k++) {
+				if(_equation(e*i/width_2, e*j/length_2, e*k/height_2)) {
 					map->cubes[map->index].x = j;
 					map->cubes[map->index].y = k;
 					map->cubes[map->index].z = i;
-					map->m[offset(j, k, i)] = map->index; 
+					map(j, k, i) = map->index; 
 					map->index++;
-				} else {
-					map->m[offset(j, k, i)] = 0;
 				}
-			}
+			}	
 		}
 	}
-    
-	// map->size = map->index;
-	// reallocate(map->cubes, sizeof(struct cube_t), map->size);
 
 	map->xmin = map->cubes[0].x;
 	map->xmax = map->cubes[0].x;
@@ -148,7 +100,7 @@ map_load(struct map_t *map, f64 time)
 	map->ymin = map->cubes[0].y;
 	map->ymax = map->cubes[0].y;
 
-	for (u64 i=0; i<map->index; i++) {
+	for (int i=0; i<map->index; i++) {
 		if (map->xmin > map->cubes[i].x)
 			map->xmin = map->cubes[i].x;
 		if (map->xmax < map->cubes[i].x)
@@ -162,23 +114,37 @@ map_load(struct map_t *map, f64 time)
 		if (map->ymax < map->cubes[i].y)
 			map->ymax = map->cubes[i].y;
 	}
+	log_command("A");
+	log_command("2K");
+	map_log_from_above(map);
+}
 
-	if (PROGRESS_BAR) {
-		log_command("2K");
-		log_command("40D");
-		if (!log_real()) {
-			fprintf(stderr, "]\n");
+void
+map_log_from_above(struct map_t *map) 
+{
+	if(map->width*map->length > 30) {
+		return;
+	}
+	printf("\nMAP FROM ABOVE from %d to %d and %d to %d\n\n", map->zmin, map->zmax, map->xmin, map->xmax);
+
+	for (int i=map->xmax; i>=map->xmin; i--) {
+		for (int j=map->zmin; j<=map->zmax; j++) {
+			int cube=0;
+			for (int k=-(int)(map->height/2); k>=-(int)(map->height/2); k--) 
+				if (map(i,k,j)>0) {
+					cube++;
+					printf("[]");
+					break;
+				}
+			if (cube==0)
+				printf("  ");
 		}
-	}
-
-	if (map->cubes == NULL) {
-		log_error("Cannot load map");
-		exit(1);
-	}
+		printf("\n");
+	} printf("\n"); fflush(stdout);
 }
 
 static void
-_check_map_size(struct map_t *map, usize added_size)
+_check_map_size(struct map_t *map, u32 added_size)
 {
 	while (map->index + added_size >= map->size) {
 		map->size *= 2;

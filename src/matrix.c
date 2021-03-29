@@ -1,9 +1,5 @@
 #include "matrix.h"
 
-static void _normalize(f32 *x);
-static f32 _dot(f32 *x, f32 *y);
-static void _cross(f32 *x, f32 *y, f32 *cross);
-
 void
 _matrix_identity(f32 *out) {
 	out[0] = 1.0f;
@@ -176,6 +172,13 @@ _matrix_lookAt(f32 *eye, f32 *center, f32 *up, f32 *out)
     out[12] = -_dot(s, eye);
     out[13] = -_dot(up, eye);
     out[14] = _dot(f, eye);
+}
+
+
+static f32
+_abs(f32 x)
+{
+	return x>0?x:-x;
 }
 
 static void

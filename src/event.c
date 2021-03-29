@@ -82,9 +82,6 @@ key_callback(void *data, enum window_key key, enum state key_state, u32 time)
 			event_data->keys &= ~CONTROL_KEY_UP;
 		}
 		break;
-
-	default:
-		break;
 	}
 
 }
@@ -175,9 +172,6 @@ void window_poll_events(struct window_t *window) {
 					window->time_ms
 				);
 				break;
-
-			default:
-				break;
 			}
 
 		} else if (event.type == SDL_KEYUP && window->key_up_callback != NULL) {
@@ -262,9 +256,6 @@ void window_poll_events(struct window_t *window) {
 					window->time_ms
 				);
 				break;
-
-			default:
-				break;
 			}
 
 		} else if (event.type == SDL_QUIT) {
@@ -280,7 +271,7 @@ void window_poll_events(struct window_t *window) {
 					event.motion.yrel,
 					window->time_ms
 				);
-			} else if (event.type == SDL_MOUSEBUTTONUP) { 
+			} else if (event.type == SDL_MOUSEBUTTONUP) {
 
 			}
 		}

@@ -10,7 +10,6 @@ void _log_debug(const char *filename, u32 line, const char *format, ...);
 
 void info(const char *format, ...);
 void log_command(const char *cmd);
-bool log_real(void);
 
 #define log_error(...) \
 	_log_error(__FILE__, __LINE__, __VA_ARGS__)
