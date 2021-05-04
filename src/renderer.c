@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-#include "renderer.h"
-#include "matrix.h"
-#include "shader.h"
-#include "draw.h"
+#include "../include/renderer.h"
+#include "../include/matrix.h"
+#include "../include/shader.h"
+#include "../include/draw.h"
 
 #define M_PI 3.14192
 #define radians(d) ((d) * M_PI / 180.0)

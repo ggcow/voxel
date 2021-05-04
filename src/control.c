@@ -1,9 +1,30 @@
-#include "control.h"
+#include "../include/control.h"
 
+#define KEY(x) control_key_map[__builtin_ctz(x)]
 
-void
-control_move(struct player_t *player, u32 keys, f32 delta)
-{
+int control_key_map[NUMBER_OF_CONTROL_KEYS];
+
+void control_key_set_defaults() {
+    KEY(CONTROL_KEY_BACKWARD) = SDLK_s;
+    KEY(CONTROL_KEY_DOWN) = SDLK_LSHIFT;
+    KEY(CONTROL_KEY_FORWARD) = SDLK_z;
+    KEY(CONTROL_KEY_LEFT) = SDLK_q;
+    KEY(CONTROL_KEY_UP) = SDLK_SPACE;
+    KEY(CONTROL_KEY_RIGHT) = SDLK_d;
+}
+
+enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
+    for (register int i=0; i<NUMBER_OF_CONTROL_KEYS; i++) {
+        if (control_key_map[i] == key_code) {
+            return (enum control_key_t) 1 << i;
+        }
+    }
+    return CONTROL_KEY_UNKNOWN;
+}
+
+#undef KEY
+
+void control_move(struct player_t *player, u32 keys, f32 delta) {
 	f32 direction[2];
 	direction[0]=player->look[0];
 	direction[1]=player->look[2];

@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-#include "event.h"
-#include "window.h"
-#include "renderer.h"
-#include "player.h"
-#include "map.h"
-#include "cube.h"
+#include "../include/event.h"
+#include "../include/window.h"
+#include "../include/renderer.h"
+#include "../include/player.h"
+#include "../include/map.h"
+#include "../include/cube.h"
 
 
 #define WIDTH 955
@@ -17,43 +17,53 @@ int main(int argc, char *argv[])
 	log_command("2J");
 	log_command("H");
 
-	struct window_t *window = window_create(WIDTH, HEIGHT); 
+	struct window_t *window = NULL;
+	struct player_t *player = NULL;
+    struct event_data_t *event_data = NULL;
+    struct map_t *map = NULL;
+    struct renderer_t *renderer = NULL;
 
+	window = window_create(WIDTH, HEIGHT);
 	if (window == NULL) {
 		log_error("Window could not be created");
-		goto exit_window;
+		goto exit;
 	}
 
-	struct player_t *player = player_create();
-
+	player = player_create();
 	if (player == NULL) {
 		log_error("Player could not be created");
-		goto exit_player;
+		goto exit;
 	}
 
-	struct event_data_t *event_data = event_data_create(player);
-
+	 event_data = event_data_create(player);
 	if (event_data == NULL) {
 		log_error("Event data could not be created");
-		goto exit_event_data;
+		goto exit;
 	}
 
-	struct map_t *map = map_create();
-
+	 map = map_create();
 	if (map == NULL) {
 		log_error("Map could not be created");
-		goto exit_map;
+		goto exit;
 	}
 
-	struct renderer_t *renderer = renderer_create(map);
-
+	renderer = renderer_create(map);
 	if (renderer == NULL) {
 		log_error("Renderer could not be created");
-		goto exit_renderer;
+		goto exit;
 	}
 
-	window_set_key_down_callback(window, key_callback, event_data);
-	window_set_key_up_callback(window, key_callback, event_data);
+    control_key_set_defaults();
+
+	log_info("map->map : %zu MiB", map->width*map->length*map->height * sizeof(map->map[0]) / 1024/1024);
+    log_info("map->cubes : %zu MiB", map->size * sizeof(map->cubes[0]) / 1024/1024);
+    log_info("renderer->buffer : %zu MiB (%d%% used)", renderer->buffer_size * sizeof(renderer->buffer[0]) / 1024/1024,
+             (int) (1.0f*renderer->buffer_index*100/renderer->buffer_size));
+    log_info("renderer->indices : %zu MiB (%d%% used)", renderer->indices_size * sizeof(renderer->indices[0]) / 1024/1024,
+             (int) (1.0f*renderer->indices_index*100/renderer->indices_size));
+    fflush(stdout);
+
+	window_set_key_callback(window, key_callback, event_data);
 	window_set_mouse_move_callback(window, mouse_move_callback, event_data);
 	window_enable_cursor(window, TRUE);
 
@@ -68,16 +78,12 @@ int main(int argc, char *argv[])
 	}
 
 
-	renderer_destroy(renderer);
-	exit_renderer:
-	map_destroy(map);
-	exit_map:
-	event_data_destroy(event_data);
-	exit_event_data:
-	player_destroy(player);
-	exit_player:
-	window_destroy(window);
-	exit_window:
+    exit:
+	if (renderer) renderer_destroy(renderer);
+	if (map) map_destroy(map);
+	if (event_data)	event_data_destroy(event_data);
+	if (player)	player_destroy(player);
+	if (window)	window_destroy(window);
 	return 0;
 }
 

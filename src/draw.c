@@ -1,5 +1,5 @@
-#include "draw.h"
-#include "opengl.h"
+#include "../include/draw.h"
+#include "../include/opengl.h"
 
 void
 draw_cubes(struct renderer_t *renderer, struct map_t *map)
@@ -39,9 +39,9 @@ draw_cubes(struct renderer_t *renderer, struct map_t *map)
 		u32 point[2][2][2];
 
 		for (int i=0; i<2; i++) {
-			face[0][i] = map_v(x+(i<<1)-1, y, z)?(map(x+(i<<1)-1, y, z) > 0):FALSE;
-			face[1][i] = map_v(x, y+(i<<1)-1, z)?(map(x, y+(i<<1)-1, z) > 0):FALSE;
-			face[2][i] = map_v(x, y, z+(i<<1)-1)?(map(x, y, z+(i<<1)-1) > 0):FALSE;
+			face[0][i] = map_v(x+(i<<1)-1, y, z)?(map_g(x+(i<<1)-1, y, z) > 0):FALSE;
+			face[1][i] = map_v(x, y+(i<<1)-1, z)?(map_g(x, y+(i<<1)-1, z) > 0):FALSE;
+			face[2][i] = map_v(x, y, z+(i<<1)-1)?(map_g(x, y, z+(i<<1)-1) > 0):FALSE;
 		}
 
 
@@ -49,11 +49,10 @@ draw_cubes(struct renderer_t *renderer, struct map_t *map)
 			for (int j=0; j<2; j++) {
 				for (int k=0; k<2; k++) {
 					if (!face[0][i] || !face[1][j] || !face[2][k]) {
-						b[*index]   = x+i;
-						b[*index+1] = y+j;
-						b[*index+2] = z+k;
-						point[i][j][k] = *index/3;
-						*index+=3;
+                        point[i][j][k] = *index/3;
+					    b[(*index)++] = x+i;
+					    b[(*index)++] = y+j;
+						b[(*index)++] = z+k;
 					} 
 				}
 			}
@@ -66,22 +65,19 @@ draw_cubes(struct renderer_t *renderer, struct map_t *map)
 				for (int k=0; k<2; k++) {
 					if (!(i^(j^k))) {
 						if (!face[2][k]) {
-							v[*index] = point[i][j][k];
-							v[*index+1] = point[1-i][j][k];
-							v[*index+2] = point[i][1-j][k];
-							*index+=3;
+							v[(*index)++] = point[i][j][k];
+							v[(*index)++] = point[1-i][j][k];
+							v[(*index)++] = point[i][1-j][k];
 						}
 						if (!face[1][j]) {
-							v[*index] = point[i][j][k];
-							v[*index+1] = point[1-i][j][k];
-							v[*index+2] = point[i][j][1-k];
-							*index+=3;
+							v[(*index)++] = point[i][j][k];
+							v[(*index)++] = point[1-i][j][k];
+							v[(*index)++] = point[i][j][1-k];
 						}
 						if (!face[0][i]) {
-							v[*index] = point[i][1-j ][k];
-							v[*index+1] = point[i][j][1-k];
-							v[*index+2] = point[i][j][k];
-							*index+=3;
+							v[(*index)++] = point[i][1-j ][k];
+							v[(*index)++] = point[i][j][1-k];
+							v[(*index)++] = point[i][j][k];
 						}
 					}
 				}

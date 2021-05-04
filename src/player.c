@@ -1,6 +1,6 @@
 #include <math.h>
-#include "player.h"
-#include "matrix.h"
+#include "../include/player.h"
+#include "../include/matrix.h"
 
 struct player_t *
 player_create(void)

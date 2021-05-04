@@ -1,4 +1,4 @@
-#include "map.h"
+#include "../include/map.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -37,6 +37,7 @@ map_create(void)
 void
 map_destroy(struct map_t *map)
 {
+    deallocate(map->map);
 	deallocate(map->cubes);
 	deallocate(map);
 	log_debug("Map destroyed");
@@ -47,7 +48,8 @@ map_load(struct map_t *map)
 {
 	map->cubes = allocate(sizeof(struct cube_t), map->size);
 	map->index = 1;
-	int taille = 50;
+	int taille = 10;
+	taille = (taille*2) | 1;
 	map->width = taille+1;
 	map->length = taille+1;
 	map->height = taille+1;
@@ -86,7 +88,7 @@ map_load(struct map_t *map)
 					map->cubes[map->index].x = j;
 					map->cubes[map->index].y = k;
 					map->cubes[map->index].z = i;
-					map(j, k, i) = map->index; 
+					map_s(j, k, i, map->index);
 					map->index++;
 				}
 			}	
@@ -131,7 +133,7 @@ map_log_from_above(struct map_t *map)
 		for (int j=map->zmin; j<=map->zmax; j++) {
 			int cube=0;
 			for (int k=-(int)(map->height/2); k>=-(int)(map->height/2); k--) 
-				if (map(i,k,j)>0) {
+				if (map_g(i,k,j)>0) {
 					cube++;
 					printf("[]");
 					break;
@@ -150,4 +152,28 @@ _check_map_size(struct map_t *map, u32 added_size)
 		map->size *= 2;
 		map->cubes = reallocate(map->cubes, sizeof(struct cube_t), map->size);
 	}
+}
+
+bool
+map_verify(i32 x, i32 y, i32 z, struct map_t *map)
+{
+    return -map->width/2 <= x && x <= map->width/2
+           && -map->length/2 <= y && y <= map->length/2
+           && -map->height/2 <= z && z <= map->height/2;
+}
+
+u32
+map_get(i32 x, i32 y, i32 z, struct map_t *map)
+{
+    return map->map[(u32)((i32)(map->length*map->height)*(x+(i32)map->width/2)
+                          + (i32)map->length*(y+(i32)map->length/2)
+                          + z+(i32)map->height/2)];
+}
+
+void
+map_set(i32 x, i32 y, i32 z, u32 index, struct map_t *map)
+{
+    map->map[(u32)((i32)(map->length*map->height)*(x+(i32)map->width/2)
+                          + (i32)map->length*(y+(i32)map->length/2)
+                          + z+(i32)map->height/2)] = index;
 }

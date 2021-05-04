@@ -1,4 +1,4 @@
-#include "shader.h"
+#include "../include/shader.h"
 
 GLuint
 _create_shader(GLenum shader_type, const GLchar *shader_source)

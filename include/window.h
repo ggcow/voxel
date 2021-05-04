@@ -5,18 +5,6 @@
 
 #include <SDL2/SDL.h>
 
-enum window_key {
-	WINDOW_KEY_ENTER = 0,
-	WINDOW_KEY_LEFT,
-	WINDOW_KEY_RIGHT,
-	WINDOW_KEY_z,
-	WINDOW_KEY_q,
-	WINDOW_KEY_s,
-	WINDOW_KEY_d,
-	WINDOW_KEY_SHIFT,
-	WINDOW_KEY_SPACE,
-};
-
 struct window_t {
 	SDL_Window *sdl_window;
 	SDL_GLContext *gl_context;
@@ -26,8 +14,7 @@ struct window_t {
 	void (*mouse_move_callback)(void *, i32, i32, u32);
 	void *mouse_move_callback_data;
 
-	void (*key_down_callback)(void *, enum window_key, enum state, u32);
-	void (*key_up_callback)(void *, enum window_key, enum state, u32);
+	void (*key_callback)(void *, SDL_KeyCode , enum state, u32);
 	void *key_callback_data;
 	bool enable_cursor;
 	f64 time_s;
@@ -59,15 +46,9 @@ void window_set_mouse_move_callback(
 	void *data
 );
 
-void window_set_key_down_callback(
+void window_set_key_callback(
 	struct window_t *window,
-	void (*callback)(void *, enum window_key, enum state, u32),
-	void *data
-);
-
-void window_set_key_up_callback(
-	struct window_t *window,
-	void (*callback)(void *, enum window_key, enum state, u32),
+	void (*callback)(void *, SDL_KeyCode, enum state, u32),
 	void *data
 );
 
