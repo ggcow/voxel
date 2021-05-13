@@ -23,7 +23,7 @@ enum control_key_t {
 void control_key_set_defaults();
 enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode);
 
-void control_move(struct player_t *player, u32 keys, f32 delta);
+void control_move(player_t *player, u32 keys, f32 delta);
 
 
 #endif

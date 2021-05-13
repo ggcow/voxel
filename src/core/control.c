@@ -1,4 +1,4 @@
-#include "../include/control.h"
+#include "core/control.h"
 
 #define KEY(x) control_key_map[__builtin_ctz(x)]
 
@@ -24,7 +24,7 @@ enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
 
 #undef KEY
 
-void control_move(struct player_t *player, u32 keys, f32 delta) {
+void control_move(player_t *player, u32 keys, f32 delta) {
 	f32 direction[2];
 	direction[0]=player->look[0];
 	direction[1]=player->look[2];

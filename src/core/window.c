@@ -1,11 +1,11 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "../include/window.h"
-#include "../include/timer.h"
-#include "../include/opengl.h"
+#include "core/window.h"
+#include "core/timer.h"
+#include "core/opengl.h"
 
 
-static void _update_metrics(struct window_t *window) {
+static void _update_metrics(window_t *window) {
     SDL_GetWindowSize(
             window->sdl_window,
             (i32 *)&window->width,
@@ -30,8 +30,8 @@ static void _update_metrics(struct window_t *window) {
     window->sdl_time = SDL_GetTicks();
 }
 
-struct window_t * window_create(u32 width, u32 height) {
-	struct window_t *window = allocate(sizeof(struct window_t), 1);
+window_t * window_create(u32 width, u32 height) {
+	window_t *window = allocate(sizeof(window_t), 1);
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 		if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -91,7 +91,7 @@ struct window_t * window_create(u32 width, u32 height) {
 	return window;
 }
 
-void window_destroy(struct window_t *window) {
+void window_destroy(window_t *window) {
 	SDL_GL_DeleteContext(window->gl_context);
 	log_debug("Context destroyed");
 
@@ -104,40 +104,40 @@ void window_destroy(struct window_t *window) {
 	deallocate(window);
 }
 
-void window_swap(struct window_t *window) {
+void window_swap(window_t *window) {
 	SDL_GL_SwapWindow(window->sdl_window);
 	_update_metrics(window);
 }
 
-void window_skip_frame(struct window_t *window) {
+void window_skip_frame(window_t *window) {
 	SDL_WaitEvent(NULL);
 	_update_metrics(window);
 }
 
-u32 window_get_width(const struct window_t *window) {
+u32 window_get_width(const window_t *window) {
 	return window->width;
 }
 
-u32 window_get_height(const struct window_t *window) {
+u32 window_get_height(const window_t *window) {
 	return window->height;
 }
 
 
-f64 window_get_time_delta(const struct window_t *window)
+f64 window_get_time_delta(const window_t *window)
 {
 	return window->time_delta;
 }
 
-u64 window_get_time_ms(const struct window_t *window) {
+u64 window_get_time_ms(const window_t *window) {
 	return window->time_ms;
 }
 
-f64 window_get_time_s(const struct window_t *window) {
+f64 window_get_time_s(const window_t *window) {
 	return window->time_s;
 }
 
 
-void window_set_mouse_move_callback(struct window_t *window,
+void window_set_mouse_move_callback(window_t *window,
 	void (*callback)(void *, i32, i32, u32),
 	void *data) {
 	window->mouse_move_callback = callback;
@@ -145,13 +145,13 @@ void window_set_mouse_move_callback(struct window_t *window,
 }
 
 
-void window_set_key_callback(struct window_t *window,
+void window_set_key_callback(window_t *window,
 	void (*callback)(void *, SDL_KeyCode , enum state, u32),
 	void *data) {
 	window->key_callback = callback;
 	window->key_callback_data = data;
 }
 
-void window_enable_cursor(struct window_t *window, bool enable) {
+void window_enable_cursor(window_t *window, bool enable) {
 	window->enable_cursor = enable;
 }

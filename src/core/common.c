@@ -1,15 +1,9 @@
-#define _POSIX_C_SOURCE 200809L
-
-#include "../include/common.h"
-
-#include "../include/log.h"
+#include "core/common.h"
+#include "core/log.h"
 
 #include <stdlib.h>
-#include <stdio.h>
 
-void *
-_allocate(const char *filename, u32 line, usize size, usize count)
-{
+void * _allocate(const char *filename, u32 line, usize size, usize count) {
 	void *pointer = calloc(count, size);
 
 	if (pointer == NULL) {
@@ -19,9 +13,7 @@ _allocate(const char *filename, u32 line, usize size, usize count)
 	return pointer;
 }
 
-void *
-_reallocate(const char *filename, u32 line, void *pointer, usize size, usize count)
-{
+void * _reallocate(const char *filename, u32 line, void *pointer, usize size, usize count) {
 	if (pointer == NULL) {
 		log_warning("Trying to reallocate NULL pointer in %s:%d", filename, line);
 
@@ -31,9 +23,7 @@ _reallocate(const char *filename, u32 line, void *pointer, usize size, usize cou
 	return realloc(pointer, size * count);
 }
 
-void
-_deallocate(const char *filename, u32 line, void *pointer)
-{
+void _deallocate(const char *filename, u32 line, void *pointer) {
 	if (pointer == NULL) {
 		log_warning("Trying to deallocate NULL pointer in %s:%d", filename, line);
 	} else {

@@ -1,12 +1,12 @@
-#include "../include/event.h"
+#include "core/event.h"
 
 void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time) {
-	struct event_data_t *event_data = (struct event_data_t*)data;
+	event_data_t *event_data = (event_data_t*)data;
 	player_set_look(event_data->player_adress, dx, dy);
 }
 
-struct event_data_t * event_data_create(struct player_t *player) {
-	struct event_data_t *event_data = allocate(sizeof(struct event_data_t), 1);
+event_data_t * event_data_create(player_t *player) {
+	event_data_t *event_data = allocate(sizeof(event_data_t), 1);
 	event_data->keys=0;
 	event_data->player_adress=player;
 	log_debug("Event data created");
@@ -14,13 +14,13 @@ struct event_data_t * event_data_create(struct player_t *player) {
 }
 
 
-void event_data_destroy(struct event_data_t *event_data) {
+void event_data_destroy(event_data_t *event_data) {
 	deallocate(event_data);
 	log_debug("Event data destroyed");
 }
 
 void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 time) {
-	struct event_data_t *event_data = (struct event_data_t*)data;
+	event_data_t *event_data = (event_data_t*)data;
 
 	enum control_key_t key = control_key_from_sdl_keycode(key_code);
 	if (key != CONTROL_KEY_UNKNOWN) {
@@ -41,7 +41,7 @@ void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 ti
 }
 
 
-void window_poll_events(struct window_t *window) {
+void window_poll_events(window_t *window) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {

@@ -1,7 +1,7 @@
 #ifndef SHADER_H
 #define SHADER_H
 
-#include "common.h"
+#include "core/common.h"
 #include "opengl.h"
 
 

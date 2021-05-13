@@ -2,7 +2,7 @@
 #define MATRIX_H
 
 #include <math.h>
-#include "common.h"
+#include "core/common.h"
 
 
 void _matrix_identity(f32 *out);

@@ -1,2 +1,2 @@
-#include "../include/cube.h"
+#include "cube.h"
  

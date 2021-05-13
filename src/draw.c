@@ -1,7 +1,7 @@
-#include "../include/draw.h"
-#include "../include/opengl.h"
+#include "draw.h"
+#include "core/opengl.h"
 
-void draw_cubes(struct renderer_t *renderer, struct map_t *map) {
+void draw_cubes(renderer_t *renderer, map_t *map) {
 	u32 loading = 0;
 
 	fprintf(stderr, "\n");
@@ -91,7 +91,7 @@ void draw_cubes(struct renderer_t *renderer, struct map_t *map) {
 
 
 static void
-_check_buffer_size(struct renderer_t *renderer, u32 buffer_added_size, u32 indices_added_size)
+_check_buffer_size(renderer_t *renderer, u32 buffer_added_size, u32 indices_added_size)
 {
 	while (renderer->buffer_index + buffer_added_size >= renderer->buffer_size) {
 		renderer->buffer_size *= 2;

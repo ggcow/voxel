@@ -1,4 +1,4 @@
-#include "../include/map.h"
+#include "map.h"
 #include <math.h>
 #include <stdlib.h>
 
@@ -10,8 +10,8 @@ bool _equation(f32 x, f32 y, f32 z) {
 	return fabsf(e) < 1.0f;
 }
 
-struct map_t * map_create(void) {
-	struct map_t *map = allocate(sizeof(struct map_t), 1);
+map_t * map_create(void) {
+	map_t *map = allocate(sizeof(map_t), 1);
 
 	map->size=1024;
 
@@ -31,17 +31,17 @@ struct map_t * map_create(void) {
 	return map;
 }
 
-void map_destroy(struct map_t *map) {
+void map_destroy(map_t *map) {
     deallocate(map->_map);
 	deallocate(map->cubes);
 	deallocate(map);
 	log_debug("Map destroyed");
 }
 
-void map_load(struct map_t *map) {
-	map->cubes = allocate(sizeof(struct cube_t), map->size);
+void map_load(map_t *map) {
+	map->cubes = allocate(sizeof(cube_t), map->size);
 	map->index = 1;
-	int taille = 3;
+	int taille = 30;
 	taille += taille%2;
 	map->width = taille+1;
 	map->length = taille+1;
@@ -114,7 +114,7 @@ void map_load(struct map_t *map) {
 	map_log_from_above(map);
 }
 
-void map_log_from_above(struct map_t *map) {
+void map_log_from_above(map_t *map) {
 	if(map->width*map->length > 30) {
 		return;
 	}
@@ -136,26 +136,26 @@ void map_log_from_above(struct map_t *map) {
 	} printf("\n"); fflush(stdout);
 }
 
-static void _check_map_size(struct map_t *map, u32 added_size) {
+static void _check_map_size(map_t *map, u32 added_size) {
 	while (map->index + added_size >= map->size) {
 		map->size *= 2;
-		map->cubes = reallocate(map->cubes, sizeof(struct cube_t), map->size);
+		map->cubes = reallocate(map->cubes, sizeof(cube_t), map->size);
 	}
 }
 
-bool map_verify(i32 x, i32 y, i32 z, struct map_t *map) {
+bool map_verify(i32 x, i32 y, i32 z, map_t *map) {
     return -(map->width/2) <= x && x <= map->width/2
            && -(map->length/2) <= y && y <= map->length/2
            && -(map->height/2) <= z && z <= map->height/2;
 }
 
-u32 map_get(i32 x, i32 y, i32 z, struct map_t *map) {
+u32 map_get(i32 x, i32 y, i32 z, map_t *map) {
     return map->_map[(u32)(map->length * map->height * (x + map->width / 2)
                            + map->length*(y+map->length/2)
                            + z +map->height/2)];
 }
 
-void map_set(i32 x, i32 y, i32 z, u32 index, struct map_t *map) {
+void map_set(i32 x, i32 y, i32 z, u32 index, map_t *map) {
     map->_map[(u32)(map->length * map->height * (x + map->width / 2)
                     + map->length*(y+map->length/2)
                     + z + map->height/2)] = index;

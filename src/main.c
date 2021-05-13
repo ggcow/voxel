@@ -1,11 +1,11 @@
 #include <stdio.h>
 
-#include "../include/event.h"
-#include "../include/window.h"
-#include "../include/renderer.h"
-#include "../include/player.h"
-#include "../include/map.h"
-#include "../include/cube.h"
+#include "core/event.h"
+#include "core/window.h"
+#include "core/renderer.h"
+#include "player.h"
+#include "map.h"
+#include "cube.h"
 
 
 #define WIDTH 955
@@ -17,11 +17,11 @@ int main(int argc, char *argv[])
 	log_command("2J");
 	log_command("H");
 
-	struct window_t *window = NULL;
-	struct player_t *player = NULL;
-    struct event_data_t *event_data = NULL;
-    struct map_t *map = NULL;
-    struct renderer_t *renderer = NULL;
+	window_t *window = NULL;
+	player_t *player = NULL;
+    event_data_t *event_data = NULL;
+    map_t *map = NULL;
+    renderer_t *renderer = NULL;
 
 	window = window_create(WIDTH, HEIGHT);
 	if (window == NULL) {

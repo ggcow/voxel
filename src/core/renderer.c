@@ -3,10 +3,10 @@
 
 #include <stdio.h>
 
-#include "../include/renderer.h"
-#include "../include/matrix.h"
-#include "../include/shader.h"
-#include "../include/draw.h"
+#include "core/renderer.h"
+#include "matrix.h"
+#include "core/shader.h"
+#include "draw.h"
 
 #define M_PI 3.14192
 #define radians(d) ((d) * M_PI / 180.0)
@@ -38,7 +38,7 @@ static const GLchar *_2D_FRAGMENT_SHADER_SOURCE =
 ;
 
 void
-renderer_draw(struct renderer_t *renderer, struct map_t *map, struct player_t *player, u32 width, u32 height)
+renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32 height)
 {
 	f32 temp[16];
 
@@ -75,7 +75,7 @@ renderer_draw(struct renderer_t *renderer, struct map_t *map, struct player_t *p
 
 
 static bool
-_setup(struct renderer_t *renderer, struct map_t *map) {
+_setup(renderer_t *renderer, map_t *map) {
 	renderer->program = _create_shader_program(
 		_2D_VERTEX_SHADER_SOURCE,
 		_2D_FRAGMENT_SHADER_SOURCE
@@ -129,9 +129,9 @@ _setup(struct renderer_t *renderer, struct map_t *map) {
 }
 
 
-struct renderer_t *
-renderer_create(struct map_t *map) {
-	struct renderer_t *renderer = allocate(sizeof(struct renderer_t), 1);
+renderer_t *
+renderer_create(map_t *map) {
+	renderer_t *renderer = allocate(sizeof(renderer_t), 1);
 
 	if (!_setup(renderer, map)) {
 		return NULL;
@@ -142,7 +142,7 @@ renderer_create(struct map_t *map) {
 }
 
 void
-renderer_destroy(struct renderer_t *renderer) {
+renderer_destroy(renderer_t *renderer) {
 	deallocate(renderer->buffer);
 	deallocate(renderer->indices);
 	deallocate(renderer);
@@ -150,7 +150,7 @@ renderer_destroy(struct renderer_t *renderer) {
 }
 
 void
-renderer_set_clear_color(struct renderer_t *renderer, f32 r, f32 g, f32 b, f32 a) {
+renderer_set_clear_color(renderer_t *renderer, f32 r, f32 g, f32 b, f32 a) {
 	renderer->clear_color[0] = r;
 	renderer->clear_color[1] = g;
 	renderer->clear_color[2] = b;

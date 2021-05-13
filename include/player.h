@@ -1,9 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "common.h"
+#include "core/common.h"
 
-struct  player_t {
+typedef struct {
 	f32 eye[3];
 
 	f32 inclination;
@@ -12,14 +12,14 @@ struct  player_t {
 	f32 look[3];
 
 	f32 speed;
-};
+} player_t;
 
 
-struct player_t * player_create(void);
-void player_destroy(struct player_t *player);
+player_t * player_create(void);
+void player_destroy(player_t *player);
 
 
-void player_set_look(struct player_t *player, i32 dx, i32 dy);
+void player_set_look(player_t *player, i32 dx, i32 dy);
 
 
 

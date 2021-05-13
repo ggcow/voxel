@@ -1,14 +1,10 @@
 #ifndef CUBE_H
 #define CUBE_H
 
-#include "common.h"
+#include "core/common.h"
 
-
-
-struct cube_t {
+typedef struct {
 	i32 x, y, z;
-};
-
-
+} cube_t;
 
 #endif

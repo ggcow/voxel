@@ -1,11 +1,11 @@
 #include <math.h>
-#include "../include/player.h"
-#include "../include/matrix.h"
+#include "player.h"
+#include "matrix.h"
 
-struct player_t *
+player_t *
 player_create(void)
 {
-	struct player_t *player = allocate(sizeof(struct player_t), 1);
+	player_t *player = allocate(sizeof(player_t), 1);
 
 	player->eye[0]=0.0f;
 	player->eye[1]=5.0f;
@@ -21,7 +21,7 @@ player_create(void)
 }
 
 void
-player_destroy(struct player_t *player)
+player_destroy(player_t *player)
 {
 	deallocate(player);
 	log_debug("Player destroyed");
@@ -29,7 +29,7 @@ player_destroy(struct player_t *player)
 
 
 void
-player_set_look(struct player_t *player, i32 dx, i32 dy)
+player_set_look(player_t *player, i32 dx, i32 dy)
 {
 	f32 *azimuth = &(player->azimuth);
 	f32 *inclination = &(player->inclination);

@@ -1,4 +1,4 @@
-#include "../include/matrix.h"
+#include "matrix.h"
 
 void
 _matrix_identity(f32 *out) {
