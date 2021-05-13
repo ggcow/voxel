@@ -32,7 +32,7 @@ static const GLchar *_2D_FRAGMENT_SHADER_SOURCE =
 "out vec3 color;"
 "in vec3 fragmentColor;"
 "void main(){"
-"	color = (fragmentColor+10)/10;"
+"	color = mod((fragmentColor+gl_PrimitiveID+10),10)/10;"
 // "color = vec3(gl_FragCoord.z / 1.5);"
 "}"
 ;
@@ -95,7 +95,7 @@ _setup(struct renderer_t *renderer, struct map_t *map) {
 
 	draw_cubes(renderer, map);
 
-	//map_log_from_above(map);
+	//map_log_from_above(_map);
 
 	glGenVertexArrays(1, &(renderer->vao));
 	glGenBuffers(1, &(renderer->vbo));

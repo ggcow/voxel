@@ -1,14 +1,12 @@
 #include "../include/draw.h"
 #include "../include/opengl.h"
 
-void
-draw_cubes(struct renderer_t *renderer, struct map_t *map)
-{
+void draw_cubes(struct renderer_t *renderer, struct map_t *map) {
 	u32 loading = 0;
 
 	fprintf(stderr, "\n");
 	for (int index=1; index<map->index; index++) {
-
+        u32 index_backup = index;
 		if (10.0f*index/map->index > loading) {
 			loading++;
 			log_command("A");
@@ -38,12 +36,11 @@ draw_cubes(struct renderer_t *renderer, struct map_t *map)
 		bool face[3][2];
 		u32 point[2][2][2];
 
-		for (int i=0; i<2; i++) {
-			face[0][i] = map_v(x+(i<<1)-1, y, z)?(map_g(x+(i<<1)-1, y, z) > 0):FALSE;
-			face[1][i] = map_v(x, y+(i<<1)-1, z)?(map_g(x, y+(i<<1)-1, z) > 0):FALSE;
-			face[2][i] = map_v(x, y, z+(i<<1)-1)?(map_g(x, y, z+(i<<1)-1) > 0):FALSE;
+		for (int i=-1; i<2; i+=2) {
+			face[0][(i+1)>>1] = map_v(x+i, y, z)?(map_g(x+i, y, z) > 0):FALSE;
+			face[1][(i+1)>>1] = map_v(x, y+i, z)?(map_g(x, y+i, z) > 0):FALSE;
+			face[2][(i+1)>>1] = map_v(x, y, z+i)?(map_g(x, y, z+i) > 0):FALSE;
 		}
-
 
 		for (int i=0; i<2; i++) {
 			for (int j=0; j<2; j++) {
@@ -60,32 +57,36 @@ draw_cubes(struct renderer_t *renderer, struct map_t *map)
 
 		index = &(renderer->indices_index);
 
-		for (int i=0; i<2; i++) {
-			for (int j=0; j<2; j++) {
-				for (int k=0; k<2; k++) {
-					if (!(i^(j^k))) {
-						if (!face[2][k]) {
-							v[(*index)++] = point[i][j][k];
-							v[(*index)++] = point[1-i][j][k];
-							v[(*index)++] = point[i][1-j][k];
-						}
-						if (!face[1][j]) {
-							v[(*index)++] = point[i][j][k];
-							v[(*index)++] = point[1-i][j][k];
-							v[(*index)++] = point[i][j][1-k];
-						}
-						if (!face[0][i]) {
-							v[(*index)++] = point[i][1-j ][k];
-							v[(*index)++] = point[i][j][1-k];
-							v[(*index)++] = point[i][j][k];
-						}
-					}
-				}
-			}
+		int i = 0, j = 0, k = 0;
+		int t=0;
+		for (int l=0; 1; l++) {
+            if (!face[2][k]) {
+                v[(*index)++] = point[i][j][k];
+                v[(*index)++] = point[1-i][j][k];
+                v[(*index)++] = point[i][1-j][k];
+            }
+            if (!face[1][j]) {
+                v[(*index)++] = point[i][j][1-k];
+                v[(*index)++] = point[i][j][k];
+                v[(*index)++] = point[1-i][j][k];
+            }
+            if (!face[0][i]) {
+                v[(*index)++] = point[i][1-j ][k];
+                v[(*index)++] = point[i][j][1-k];
+                v[(*index)++] = point[i][j][k];
+            }
+            if (l==3) break;
+            t = ~(1<<l);
+            i = 1&t;
+            j = (2&t)>>1;
+            k = (4&t)>>2;
 		}
 	}
 	log_command("A");
 	log_command("2K");
+	u32 count = 0;
+
+	log_info("%d points", renderer->buffer_index/3);
 }
 
 

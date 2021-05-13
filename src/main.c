@@ -55,7 +55,7 @@ int main(int argc, char *argv[])
 
     control_key_set_defaults();
 
-	log_info("map->map : %zu MiB", map->width*map->length*map->height * sizeof(map->map[0]) / 1024/1024);
+	log_info("map->map : %zu MiB", map->width * map->length * map->height * sizeof(map->_map[0]) / 1024 / 1024);
     log_info("map->cubes : %zu MiB", map->size * sizeof(map->cubes[0]) / 1024/1024);
     log_info("renderer->buffer : %zu MiB (%d%% used)", renderer->buffer_size * sizeof(renderer->buffer[0]) / 1024/1024,
              (int) (1.0f*renderer->buffer_index*100/renderer->buffer_size));

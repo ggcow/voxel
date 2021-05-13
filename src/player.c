@@ -14,7 +14,7 @@ player_create(void)
 	player->inclination=0.0f;
 	player->azimuth=0.0f;
 
-	player->speed=200.0f;
+	player->speed=5.0f;
 
 	log_debug("Player created");
 	return player;
