@@ -35,13 +35,13 @@ int main(int argc, char *argv[])
 		goto exit;
 	}
 
-	 event_data = event_data_create(player);
+	event_data = event_data_create(player);
 	if (event_data == NULL) {
 		log_error("Event data could not be created");
 		goto exit;
 	}
 
-	 map = map_create();
+	map = map_create();
 	if (map == NULL) {
 		log_error("Map could not be created");
 		goto exit;
@@ -53,14 +53,15 @@ int main(int argc, char *argv[])
 		goto exit;
 	}
 
-    control_key_set_defaults();
+	player->speed *= cbrt(map->length*map->width*map->height);
 
+    control_key_set_defaults();
 	log_info("map->map : %zu MiB", map->width * map->length * map->height * sizeof(map->_map[0]) / 1024 / 1024);
-    log_info("map->cubes : %zu MiB", map->size * sizeof(map->cubes[0]) / 1024/1024);
-    log_info("renderer->buffer : %zu MiB (%d%% used)", renderer->buffer_size * sizeof(renderer->buffer[0]) / 1024/1024,
-             (int) (1.0f*renderer->buffer_index*100/renderer->buffer_size));
-    log_info("renderer->indices : %zu MiB (%d%% used)", renderer->indices_size * sizeof(renderer->indices[0]) / 1024/1024,
-             (int) (1.0f*renderer->indices_index*100/renderer->indices_size));
+    log_info("map->cubes : %zu MiB", map->cube_buffer.size * sizeof(*map->cube_buffer.data) / 1024/1024);
+    log_info("renderer->vertex : %zu MiB (%d%% used)", renderer->vertex_buffer.size * sizeof(*renderer->vertex_buffer.data) / 1024/1024,
+             (int) (1.0f*renderer->vertex_buffer.index*100/renderer->vertex_buffer.size));
+    log_info("renderer->element : %zu MiB (%d%% used)", renderer->element_buffer.size * sizeof(*renderer->element_buffer.data) / 1024/1024,
+             (int) (1.0f*renderer->element_buffer.index*100/renderer->element_buffer.size));
     fflush(stdout);
 
 	window_set_key_callback(window, key_callback, event_data);

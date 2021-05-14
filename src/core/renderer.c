@@ -33,27 +33,21 @@ static const GLchar *_2D_FRAGMENT_SHADER_SOURCE =
 "in vec3 fragmentColor;"
 "void main(){"
 "	color = mod((fragmentColor+gl_PrimitiveID+10),10)/10;"
-// "color = vec3(gl_FragCoord.z / 1.5);"
+// "color = vec3(1,0,0);"
 "}"
 ;
 
-void
-renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32 height)
-{
+void renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32 height) {
 	f32 temp[16];
 
 	f32 projection[16];
 	_matrix_perspective(radians(90.0f), (f32) width / (f32)height, 0.1f, 1000.0f, projection);
 
 	f32 view[16];
-
 	f32 up[3]={0,1,0};
 	f32 center[3];
-	center[0]=player->eye[0]+player->look[0];
-	center[1]=player->eye[1]+player->look[1];
-	center[2]=player->eye[2]+player->look[2];
 
-	_matrix_lookAt(player->eye, center, up, view);
+	_matrix_lookAt(player->eye, player->look, up, view);
 
 	f32 model[16];
 	_matrix_identity(model);
@@ -69,13 +63,12 @@ renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDrawElements(GL_TRIANGLES, renderer->indices_index, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, renderer->element_buffer.index, GL_UNSIGNED_INT, (void *)0);
 }
 
 
 
-static bool
-_setup(renderer_t *renderer, map_t *map) {
+static bool _setup(renderer_t *renderer, map_t *map) {
 	renderer->program = _create_shader_program(
 		_2D_VERTEX_SHADER_SOURCE,
 		_2D_FRAGMENT_SHADER_SOURCE
@@ -85,13 +78,9 @@ _setup(renderer_t *renderer, map_t *map) {
 		return FALSE;
 	}
 
-	renderer->buffer_size = 1024;
-	renderer->buffer_index = 0;
-	renderer->indices_size = 1024;
-	renderer->indices_index = 0;
 
-	renderer->indices = allocate(sizeof(GLuint), renderer->indices_size);
-	renderer->buffer = allocate(sizeof(GLfloat), renderer->buffer_size);
+	buffer_init(renderer->vertex_buffer);
+	buffer_init(renderer->element_buffer);
 
 	draw_cubes(renderer, map);
 
@@ -102,13 +91,23 @@ _setup(renderer_t *renderer, map_t *map) {
 	glGenBuffers(1, &(renderer->ebo));
 
 	glBindVertexArray(renderer->vao);
-	
+
+//	log_info("render : %u vertices", renderer->vertex_buffer.index/3);
+//	for (u32 i=0; i<renderer->vertex_buffer.index; i+=3) {
+//	    log_info("%d %d %d", renderer->vertex_buffer.data[i], renderer->vertex_buffer.data[i+1], renderer->vertex_buffer.data[i+2]);
+//	}
+//
+//    log_info("render : %u triangles", renderer->element_buffer.index/3);
+//    for (u32 i=0; i<renderer->element_buffer.index; i+=3) {
+//        log_info("%d %d %d", renderer->element_buffer.data[i], renderer->element_buffer.data[i+1], renderer->element_buffer.data[i+2]);
+//    }
+
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLfloat)*(renderer->buffer_index), renderer->buffer, GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLint)*(renderer->vertex_buffer.index), renderer->vertex_buffer.data, GL_STATIC_DRAW);
 
 	
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*(renderer->indices_index), renderer->indices, GL_STATIC_DRAW); 
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*(renderer->element_buffer.index), renderer->element_buffer.data, GL_STATIC_DRAW);
 
 
 	renderer_set_clear_color(renderer, 0.0f, 0.0f, 0.0f, 0.0f);
@@ -116,7 +115,7 @@ _setup(renderer_t *renderer, map_t *map) {
 
 	
 
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, 0, (void*)0);
 	glEnableVertexAttribArray(0);  
 
 	glUseProgram(renderer->program);
@@ -129,9 +128,8 @@ _setup(renderer_t *renderer, map_t *map) {
 }
 
 
-renderer_t *
-renderer_create(map_t *map) {
-	renderer_t *renderer = allocate(sizeof(renderer_t), 1);
+renderer_t * renderer_create(map_t *map) {
+	renderer_t *renderer = allocate(sizeof(renderer_t));
 
 	if (!_setup(renderer, map)) {
 		return NULL;
@@ -141,16 +139,14 @@ renderer_create(map_t *map) {
 	return renderer;
 }
 
-void
-renderer_destroy(renderer_t *renderer) {
-	deallocate(renderer->buffer);
-	deallocate(renderer->indices);
+void renderer_destroy(renderer_t *renderer) {
+	buffer_terminate(renderer->vertex_buffer);
+	buffer_terminate(renderer->element_buffer);
 	deallocate(renderer);
 	log_debug("Renderer destroyed");
 }
 
-void
-renderer_set_clear_color(renderer_t *renderer, f32 r, f32 g, f32 b, f32 a) {
+void renderer_set_clear_color(renderer_t *renderer, f32 r, f32 g, f32 b, f32 a) {
 	renderer->clear_color[0] = r;
 	renderer->clear_color[1] = g;
 	renderer->clear_color[2] = b;

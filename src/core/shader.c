@@ -1,8 +1,6 @@
 #include "core/shader.h"
 
-GLuint
-_create_shader(GLenum shader_type, const GLchar *shader_source)
-{
+GLuint _create_shader(GLenum shader_type, const GLchar *shader_source) {
 	GLuint shader = glCreateShader(shader_type);
 	if (shader == 0) {
 		goto exit;
@@ -16,7 +14,7 @@ _create_shader(GLenum shader_type, const GLchar *shader_source)
 	if (success != GL_TRUE) {
 		GLint log_length;
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &log_length);
-		GLchar *log = allocate(sizeof(GLchar), log_length);
+		GLchar *log = allocate(sizeof(GLchar) * log_length);
 		glGetShaderInfoLog(shader, log_length, &log_length, log);
 		log_error("Shader compilation failed:\n%s", log);
 		deallocate(log);
@@ -28,9 +26,7 @@ exit:
 	return shader;
 }
 
-GLuint 
-_create_shader_program(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source)
-{
+GLuint _create_shader_program(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source) {
 	GLuint shader_program = 0;
 
 	GLuint vertex_shader = _create_shader(GL_VERTEX_SHADER, vertex_shader_source);
@@ -58,7 +54,7 @@ _create_shader_program(const GLchar *vertex_shader_source, const GLchar *fragmen
 	if (success != GL_TRUE) {
 		GLint log_length;
 		glGetProgramiv(shader_program, GL_INFO_LOG_LENGTH, &log_length);
-		GLchar *log = allocate(sizeof(GLchar), log_length);
+		GLchar *log = allocate(sizeof(GLchar) * log_length);
 		glGetProgramInfoLog(shader_program, log_length, &log_length, log);
 		log_error("Shader program linking failed:\n%s", log);
 		deallocate(log);

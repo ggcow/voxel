@@ -5,7 +5,7 @@
 player_t *
 player_create(void)
 {
-	player_t *player = allocate(sizeof(player_t), 1);
+	player_t *player = allocate(sizeof(player_t));
 
 	player->eye[0]=0.0f;
 	player->eye[1]=5.0f;
@@ -14,7 +14,7 @@ player_create(void)
 	player->inclination=0.0f;
 	player->azimuth=0.0f;
 
-	player->speed=5.0f;
+	player->speed=1.0f;
 
 	log_debug("Player created");
 	return player;

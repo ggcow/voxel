@@ -3,8 +3,8 @@
 
 #include <stdlib.h>
 
-void * _allocate(const char *filename, u32 line, usize size, usize count) {
-	void *pointer = calloc(count, size);
+void * _allocate(const char *filename, u32 line, usize size) {
+	void *pointer = malloc(size);
 
 	if (pointer == NULL) {
 		log_error("Allocation failed in %s:%d", filename, line);
@@ -13,14 +13,24 @@ void * _allocate(const char *filename, u32 line, usize size, usize count) {
 	return pointer;
 }
 
-void * _reallocate(const char *filename, u32 line, void *pointer, usize size, usize count) {
+void * _callocate(const char *filename, u32 line, usize size, usize count) {
+    void *pointer = calloc(size, count);
+
+    if (pointer == NULL) {
+        log_error("Allocation failed in %s:%d", filename, line);
+    }
+
+    return pointer;
+}
+
+void * _reallocate(const char *filename, u32 line, void *pointer, usize size) {
 	if (pointer == NULL) {
 		log_warning("Trying to reallocate NULL pointer in %s:%d", filename, line);
 
-		return allocate(size, count);
+		return allocate(size);
 	}
 
-	return realloc(pointer, size * count);
+	return realloc(pointer, size);
 }
 
 void _deallocate(const char *filename, u32 line, void *pointer) {

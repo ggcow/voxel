@@ -7,6 +7,7 @@
 #include "map.h"
 
 #include "opengl.h"
+#include "buffer.h"
 
 typedef struct {
 	f32 clear_color[4];
@@ -15,12 +16,8 @@ typedef struct {
 	GLuint vbo;
 	GLuint ebo;
 
-	GLfloat *buffer;
-	u32 buffer_size;
-	u32 buffer_index;
-	GLuint *indices;
-	u32 indices_size;
-	u32 indices_index;
+	buffer_type(GLint) vertex_buffer;
+    buffer_type(GLuint) element_buffer;
 } renderer_t;
 
 

@@ -43,13 +43,17 @@ enum state {
 #define NULL 0
 #endif
 
-void * _allocate(const char *filename, u32 line, usize size, usize count);
-void * _reallocate(const char *filename, u32 line, void *pointer, usize size, usize count);
+void * _allocate(const char *filename, u32 line, usize size);
+void *_callocate(const char *filename, u32 line, usize size, usize count);
+void * _reallocate(const char *filename, u32 line, void *pointer, usize size);
 void _deallocate(const char *filename, u32 line, void *pointer);
+
 
 
 #define allocate(...) \
 	_allocate(__FILE__, __LINE__, __VA_ARGS__)
+#define callocate(...) \
+	_callocate(__FILE__, __LINE__, __VA_ARGS__)
 #define reallocate(...) \
 	_reallocate(__FILE__, __LINE__, __VA_ARGS__)
 #define deallocate(...) \
