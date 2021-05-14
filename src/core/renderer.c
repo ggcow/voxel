@@ -38,26 +38,13 @@ static const GLchar *_2D_FRAGMENT_SHADER_SOURCE =
 ;
 
 void renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32 height) {
-	f32 temp[16];
 
-	f32 projection[16];
-	_matrix_perspective(radians(90.0f), (f32) width / (f32)height, 0.1f, 1000.0f, projection);
-
-	f32 view[16];
-	f32 up[3]={0,1,0};
-	f32 center[3];
-
-	_matrix_lookAt(player->eye, player->look, up, view);
-
-	f32 model[16];
-	_matrix_identity(model);
-
-	f32 mvp[16];
-	_matrix_multiply(model, view, temp);
-	_matrix_multiply(projection, temp, mvp);
+	matrix_t perspective = matrix_perspective(radians(90.0f), (f32) width / (f32)height, 0.1f, 1000.0f);
+    matrix_t view = matrix_lookAt(player->eye, player->look, (f32[3]){0,1,0});
+	matrix_t mvp = matrix_multiply(perspective, view);
 
 	GLuint MatrixID = glGetUniformLocation(renderer->program, "MVP");
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, &mvp[0]);
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, (GLfloat *) &mvp);
 
 	glViewport(0, 0, width, height);
 
