@@ -9,37 +9,6 @@
 
 static bool setup(renderer_t *renderer, map_t *map);
 
-static const GLchar *_2D_VERTEX_SHADER_SOURCE = 
-
-"#version 330 core                                                                                          \n\
-                                                                                                            \n\
-const mat3 M[3] = mat3[](                                                                                   \n\
-                   mat3(0,0,1,0,1,0,-1,0,0),                                                                \n\
-                   mat3(1,0,0,0,0,-1,0,-1,0),                                                               \n\
-                   mat3(1,0,0,0,1,0,0,0,1));                                                                \n\
-                                                                                                            \n\
-layout(location = 0) in vec2 vertex_position;                                                               \n\
-layout(location = 1) in vec4 vertex_data;                                                                   \n\
-                                                                                                            \n\
-uniform mat4 MVP;                                                                                           \n\
-out vec3 fragmentColor;                                                                                     \n\
-                                                                                                            \n\
-void main(){                                                                                                \n\
-	gl_Position =  MVP * vec4(M[int(vertex_data.w)] * vec3(vertex_position,0)+vertex_data.xyz,1);           \n\
-	fragmentColor = vertex_data.xyz;                                                                        \n\
-}";
-
-
-static const GLchar *_2D_FRAGMENT_SHADER_SOURCE = 
-"#version 330 core                                                                                          \n\
-                                                                                                            \n\
-out vec3 color;                                                                                             \n\
-in vec3 fragmentColor;                                                                                      \n\
-void main() {                                                                                               \n\
-	color = mod(fragmentColor,20)/20;                                                                       \n\
-//  color = fragmentColor;                                                                                  \n\
-}";
-
 void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
 
 	GLuint MatrixID = glGetUniformLocation(renderer->program, "MVP");
@@ -56,10 +25,26 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
 
 
 static bool setup(renderer_t *renderer, map_t *map) {
-	renderer->program = _create_shader_program(
-		_2D_VERTEX_SHADER_SOURCE,
-		_2D_FRAGMENT_SHADER_SOURCE
-	);
+    char vertex_shader_path[200];
+    char fragment_shader_path[200];
+    strcpy(vertex_shader_path, ROOT_FOLDER);
+    strcpy(fragment_shader_path, ROOT_FOLDER);
+    strcat(vertex_shader_path, "/shaders/vertex.vs");
+    strcat(fragment_shader_path, "/shaders/fragment.fs");
+    char *vertex_shader_code = shader_load_from_file(vertex_shader_path);
+    char *fragment_shader_code = shader_load_from_file(fragment_shader_path);
+
+    if (vertex_shader_code[0] == '\0' || fragment_shader_code[0] == '\0') {
+        return FALSE;
+    }
+
+	renderer->program = create_shader_program(
+            vertex_shader_code,
+            fragment_shader_code
+    );
+
+	deallocate(vertex_shader_code);
+	deallocate(fragment_shader_code);
 
 	if (renderer->program == 0) {
 		return FALSE;

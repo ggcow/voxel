@@ -3,6 +3,7 @@
 
 #include "common.h"
 #include "opengl.h"
+#include "cube.h"
 
 #define buffer_type(type) struct buffer_##type##_t
 

@@ -1,6 +1,23 @@
 #include "core/shader.h"
+#include "core/common.h"
 
-GLuint _create_shader(GLenum shader_type, const GLchar *shader_source) {
+char * shader_load_from_file(char *path) {
+    FILE * f = fopen(path, "r");
+    if (!f) {
+        log_error("Could not find shader file : %s", path);
+        perror (NULL);
+        return "";
+    }
+    fseek(f, 0, SEEK_END);
+    long length = ftell(f);
+    rewind(f);
+    char *shader = allocate(length);
+    fread(shader, 1, length, f);
+    fclose(f);
+    return shader;
+}
+
+GLuint create_shader(GLenum shader_type, const GLchar *shader_source) {
 	GLuint shader = glCreateShader(shader_type);
 	if (shader == 0) {
 		goto exit;
@@ -26,15 +43,15 @@ exit:
 	return shader;
 }
 
-GLuint _create_shader_program(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source) {
+GLuint create_shader_program(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source) {
 	GLuint shader_program = 0;
 
-	GLuint vertex_shader = _create_shader(GL_VERTEX_SHADER, vertex_shader_source);
+	GLuint vertex_shader = create_shader(GL_VERTEX_SHADER, vertex_shader_source);
 	if (vertex_shader == 0) {
 		goto exit;
 	}
 
-	GLuint fragment_shader = _create_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
+	GLuint fragment_shader = create_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
 	if (fragment_shader == 0) {
 		goto delete_vertex_shader;
 	}
