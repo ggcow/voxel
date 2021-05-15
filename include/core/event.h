@@ -5,6 +5,7 @@
 #include "window.h"
 #include "core/control.h"
 #include "player.h"
+#include "matrix.h"
 
 typedef struct {
 	bool *close_requested;
@@ -15,7 +16,7 @@ typedef struct {
 
 void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time);
 void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 time);
-void window_poll_events(window_t *window);
+void window_poll_events(window_t *window, matrix_t *perspective);
 
 event_data_t * event_data_create(player_t *player);
 void event_data_destroy(event_data_t *event_data);

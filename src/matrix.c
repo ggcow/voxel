@@ -1,5 +1,10 @@
 #include "matrix.h"
 
+static void normalize(f32 *x);
+static inline f32 dot(f32 *x, f32 *y);
+static void cross(f32 *x, f32 *y, f32 *cross);
+static void matrix_display(matrix_t matrix);
+
 matrix_t matrix_perspective(f32 fov, f32 aspect, f32 near, f32 far) {
 	matrix_t matrix = matrix_identity;
     f32 tan_half_angle = tanf(fov / 2);
@@ -14,14 +19,14 @@ matrix_t matrix_perspective(f32 fov, f32 aspect, f32 near, f32 far) {
 
 matrix_t matrix_lookAt(f32 eye[3], f32 look[3], f32 up[3]) {
     f32 s[3];
-    _cross(look, up, s);
-    _normalize(s);
-    _cross(s, look, up);
+    cross(look, up, s);
+    normalize(s);
+    cross(s, look, up);
 
     return (matrix_t) {{s[0], up[0], -look[0], 0,
                         s[1], up[1], -look[1], 0,
                         s[2], up[2], -look[2], 0,
-                        -_dot(s, eye), -_dot(up, eye), _dot(look, eye), 1}};
+                        -dot(s, eye), -dot(up, eye), dot(look, eye), 1}};
 
 }
 
@@ -53,6 +58,7 @@ matrix_t matrix_rotation_x(const f32 angle) {
 	matrix.m[6]=-s;
 	matrix.m[9]=s;
 	matrix.m[10]=c;
+    return matrix;
 }
 
 matrix_t matrix_rotation_y(const f32 angle) {
@@ -64,6 +70,7 @@ matrix_t matrix_rotation_y(const f32 angle) {
 	matrix.m[2]=s;
 	matrix.m[8]=-s;
 	matrix.m[10]=c;
+    return matrix;
 }
 
 
@@ -76,6 +83,7 @@ matrix_t matrix_rotation_z(const f32 angle) {
 	matrix.m[1]=s;
 	matrix.m[4]=-s;
 	matrix.m[5]=c;
+    return matrix;
 }
 
 matrix_t matrix_translation(const f32 t[3]) {
@@ -83,10 +91,11 @@ matrix_t matrix_translation(const f32 t[3]) {
 	matrix.m[12]=t[0];
 	matrix.m[13]=t[1];
 	matrix.m[14]=t[2];
+	return matrix;
 }
 
-static void _normalize(f32 *x) {
-	f32 n = _dot(x, x);
+static void normalize(f32 *x) {
+	f32 n = dot(x, x);
 	if(n != 0) {
 		n=sqrt(n);
 		x[0]/=n;
@@ -95,18 +104,21 @@ static void _normalize(f32 *x) {
 	}
 }
 
-static inline f32 _dot(f32 x[3], f32 y[3]) {
+static f32 dot(f32 x[3], f32 y[3]) {
 	return x[0]*y[0]+x[1]*y[1]+x[2]*y[2];
 }
 
-static void _cross(f32 x[3], f32 y[3], f32 *cross)
+static void cross(f32 x[3], f32 y[3], f32 *cross)
 {  
     cross[0] = x[1] * y[2] - x[2] * y[1]; 
     cross[1] = x[2] * y[0] - x[0] * y[2]; 
     cross[2] = x[0] * y[1] - x[1] * y[0];
 }
 
-void _matrix_display(matrix_t matrix) {
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wunused-function"
+
+void matrix_display(matrix_t matrix) {
 	fprintf(stderr, "\n\n╭───────────────────────────────────────────────╮");
 	for(int i=0; i<4; i++) {
 		fprintf(stderr, "\n│");
@@ -118,5 +130,7 @@ void _matrix_display(matrix_t matrix) {
 	}
 	fprintf(stderr, "\n\n");
 }
+
+#pragma GCC diagnostic pop
 
 //╭╮╰╯ │

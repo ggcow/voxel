@@ -3,12 +3,6 @@
 #include "core/opengl.h"
 
 static void _update_metrics(window_t *window) {
-    SDL_GetWindowSize(
-            window->sdl_window,
-            (i32 *)&window->width,
-            (i32 *)&window->height
-    );
-
     static u32 frame_count = 0;
     static f64 frame_start_time = 0;
 
@@ -83,7 +77,7 @@ window_t * window_create(u32 width, u32 height) {
 	window->width = width;
 	window->height = height;
 
-	SDL_GL_SetSwapInterval(0);
+	SDL_GL_SetSwapInterval(1);
 
 	return window;
 }

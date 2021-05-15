@@ -1,4 +1,5 @@
 #include "core/event.h"
+#include "core/opengl.h"
 
 void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time) {
 	event_data_t *event_data = (event_data_t*)data;
@@ -37,21 +38,33 @@ void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 ti
         case SDLK_RETURN:
             *(event_data->close_requested) = TRUE;
             break;
+	    default:;
     }
 }
 
 
-void window_poll_events(window_t *window) {
+void window_poll_events(window_t *window, matrix_t *perspective) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
             window->close_requested = TRUE;
+        } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_RESIZED) {
+            SDL_GetWindowSize(
+                    window->sdl_window,
+                    (i32 *) &window->width,
+                    (i32 *) &window->height
+            );
+            glViewport(0, 0, window->width, window->height);
+            *perspective = matrix_perspective(radians(90.0f),
+                                              (f32) window->width/window->height,
+                                              0.1f,
+                                              1000.0f);
         } else if (event.type == SDL_KEYDOWN && window->key_callback) {
-            window->key_callback(window->key_callback_data,
-                                      event.key.keysym.sym,
-                                      DOWN,
-                                      window->time_ms);
-		} else if (event.type == SDL_KEYUP && window->key_callback) {
+                window->key_callback(window->key_callback_data,
+                                     event.key.keysym.sym,
+                                     DOWN,
+                                     window->time_ms);
+        } else if (event.type == SDL_KEYUP && window->key_callback) {
             window->key_callback(window->key_callback_data,
                                  event.key.keysym.sym,
                                  UP,

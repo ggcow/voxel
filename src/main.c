@@ -5,12 +5,11 @@
 #include "core/renderer.h"
 #include "player.h"
 #include "map.h"
-#include "cube.h"
+#include "matrix.h"
 
 
 #define WIDTH 955
 #define HEIGHT 1020
-
 
 int main(int argc, char *argv[])
 {
@@ -58,10 +57,8 @@ int main(int argc, char *argv[])
     control_key_set_defaults();
 	log_info("map->map : %zu MiB", map->width * map->length * map->height * sizeof(map->_map[0]) / 1024 / 1024);
     log_info("map->cubes : %zu MiB", map->cube_buffer.size * sizeof(*map->cube_buffer.data) / 1024/1024);
-    log_info("renderer->vertex : %zu MiB (%d%% used)", renderer->vertex_buffer.size * sizeof(*renderer->vertex_buffer.data) / 1024/1024,
-             (int) (1.0f*renderer->vertex_buffer.index*100/renderer->vertex_buffer.size));
-    log_info("renderer->element : %zu MiB (%d%% used)", renderer->element_buffer.size * sizeof(*renderer->element_buffer.data) / 1024/1024,
-             (int) (1.0f*renderer->element_buffer.index*100/renderer->element_buffer.size));
+    log_info("renderer->data : %zu MiB (%d%% used)", renderer->data_buffer.size * sizeof(*renderer->data_buffer.data) / 1024/1024,
+             (int) (1.0f*renderer->data_buffer.index*100/renderer->data_buffer.size));
     fflush(stdout);
 
 	window_set_key_callback(window, key_callback, event_data);
@@ -70,11 +67,21 @@ int main(int argc, char *argv[])
 
 	event_data->close_requested = &(window->close_requested);
 
+    map_destroy(map);
+    map = NULL;
+
+    matrix_t view, perspective, mvp;
 
 	while (!window->close_requested) {
-		window_poll_events(window);
+		window_poll_events(window, &perspective);
 		control_move(player, event_data->keys, (f32)window_get_time_delta(window)/1000000);
-		renderer_draw(renderer, map, player, WIDTH, HEIGHT);
+
+
+
+        view = matrix_lookAt(player->eye, player->look, (f32[3]){0,1,0});
+        mvp = matrix_multiply(perspective, view);
+
+		renderer_draw(renderer, player, &mvp);
 		window_swap(window);
 	}
 

@@ -8,24 +8,25 @@
 
 #include "opengl.h"
 #include "buffer.h"
+#include "matrix.h"
 
 typedef struct {
 	f32 clear_color[4];
 	GLuint program;
 	GLuint vao;
 	GLuint vbo;
-	GLuint ebo;
+	GLuint dbo;
 
 	buffer_type(GLint) vertex_buffer;
-    buffer_type(GLuint) element_buffer;
+    buffer_type(GLint) data_buffer;
 } renderer_t;
 
 
 
 renderer_t * renderer_create(map_t *map);
-static bool _setup(renderer_t *renderer, map_t *map);
 void renderer_destroy(renderer_t *renderer);
+
 void renderer_set_clear_color(renderer_t *renderer, f32 r, f32 g, f32 b, f32 a);
-void renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32 height);
+void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp);
 
 #endif

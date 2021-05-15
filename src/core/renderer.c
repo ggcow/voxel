@@ -4,58 +4,58 @@
 #include <stdio.h>
 
 #include "core/renderer.h"
-#include "matrix.h"
 #include "core/shader.h"
 #include "draw.h"
 
-#define M_PI 3.14192
-#define radians(d) ((d) * M_PI / 180.0)
+static bool setup(renderer_t *renderer, map_t *map);
 
 static const GLchar *_2D_VERTEX_SHADER_SOURCE = 
 
-"#version 330 core\n"
-
-"layout(location = 0) in vec3 vertexPosition_modelspace;"
-  
-"uniform mat4 MVP;"
-"out vec3 fragmentColor;"
-  
-"void main(){"
-"	gl_Position =  MVP * vec4(vertexPosition_modelspace,1);"
-"	fragmentColor = vertexPosition_modelspace;"
-"}"
-;
+"#version 330 core                                                                                          \n\
+                                                                                                            \n\
+const mat3 M[3] = mat3[](                                                                                   \n\
+                   mat3(0,0,1,0,1,0,-1,0,0),                                                                \n\
+                   mat3(1,0,0,0,0,-1,0,-1,0),                                                               \n\
+                   mat3(1,0,0,0,1,0,0,0,1));                                                                \n\
+                                                                                                            \n\
+layout(location = 0) in vec2 vertex_position;                                                               \n\
+layout(location = 1) in vec4 vertex_data;                                                                   \n\
+                                                                                                            \n\
+uniform mat4 MVP;                                                                                           \n\
+out vec3 fragmentColor;                                                                                     \n\
+                                                                                                            \n\
+void main(){                                                                                                \n\
+	gl_Position =  MVP * vec4(M[int(vertex_data.w)] * vec3(vertex_position,0)+vertex_data.xyz,1);           \n\
+	fragmentColor = vertex_data.xyz;                                                                        \n\
+}";
 
 
 static const GLchar *_2D_FRAGMENT_SHADER_SOURCE = 
-"#version 330 core\n"
-"out vec3 color;"
-"in vec3 fragmentColor;"
-"void main(){"
-"	color = mod((fragmentColor+gl_PrimitiveID+10),10)/10;"
-// "color = vec3(1,0,0);"
-"}"
-;
+"#version 330 core                                                                                          \n\
+                                                                                                            \n\
+out vec3 color;                                                                                             \n\
+in vec3 fragmentColor;                                                                                      \n\
+void main() {                                                                                               \n\
+	color = mod(fragmentColor,20)/20;                                                                       \n\
+//  color = fragmentColor;                                                                                  \n\
+}";
 
-void renderer_draw(renderer_t *renderer, map_t *map, player_t *player, u32 width, u32 height) {
-
-	matrix_t perspective = matrix_perspective(radians(90.0f), (f32) width / (f32)height, 0.1f, 1000.0f);
-    matrix_t view = matrix_lookAt(player->eye, player->look, (f32[3]){0,1,0});
-	matrix_t mvp = matrix_multiply(perspective, view);
+void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
 
 	GLuint MatrixID = glGetUniformLocation(renderer->program, "MVP");
-	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, (GLfloat *) &mvp);
-
-	glViewport(0, 0, width, height);
+	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, (GLfloat *) mvp);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-	glDrawElements(GL_TRIANGLES, renderer->element_buffer.index, GL_UNSIGNED_INT, (void *)0);
+	glDrawArraysInstanced(GL_TRIANGLE_STRIP,
+                         0,
+                         renderer->vertex_buffer.index,
+                         renderer->data_buffer.index/4);
 }
 
 
 
-static bool _setup(renderer_t *renderer, map_t *map) {
+static bool setup(renderer_t *renderer, map_t *map) {
 	renderer->program = _create_shader_program(
 		_2D_VERTEX_SHADER_SOURCE,
 		_2D_FRAGMENT_SHADER_SOURCE
@@ -65,51 +65,44 @@ static bool _setup(renderer_t *renderer, map_t *map) {
 		return FALSE;
 	}
 
-
 	buffer_init(renderer->vertex_buffer);
-	buffer_init(renderer->element_buffer);
+	buffer_init(renderer->data_buffer);
 
 	draw_cubes(renderer, map);
-
-	//map_log_from_above(_map);
+    buffer_check_size(renderer->vertex_buffer, 8);
+    buffer_push(renderer->vertex_buffer, 0); buffer_push(renderer->vertex_buffer, 0);
+    buffer_push(renderer->vertex_buffer, 0); buffer_push(renderer->vertex_buffer, 1);
+    buffer_push(renderer->vertex_buffer, 1); buffer_push(renderer->vertex_buffer, 1);
+    buffer_push(renderer->vertex_buffer, 1); buffer_push(renderer->vertex_buffer, 0);
 
 	glGenVertexArrays(1, &(renderer->vao));
 	glGenBuffers(1, &(renderer->vbo));
-	glGenBuffers(1, &(renderer->ebo));
+	glGenBuffers(1, &(renderer->dbo));
 
 	glBindVertexArray(renderer->vao);
 
-//	log_info("render : %u vertices", renderer->vertex_buffer.index/3);
-//	for (u32 i=0; i<renderer->vertex_buffer.index; i+=3) {
-//	    log_info("%d %d %d", renderer->vertex_buffer.data[i], renderer->vertex_buffer.data[i+1], renderer->vertex_buffer.data[i+2]);
-//	}
-//
-//    log_info("render : %u triangles", renderer->element_buffer.index/3);
-//    for (u32 i=0; i<renderer->element_buffer.index; i+=3) {
-//        log_info("%d %d %d", renderer->element_buffer.data[i], renderer->element_buffer.data[i+1], renderer->element_buffer.data[i+2]);
-//    }
-
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(GLint)*(renderer->vertex_buffer.index), renderer->vertex_buffer.data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, 0, (void*)0);
 
-	
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, renderer->ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint)*(renderer->element_buffer.index), renderer->element_buffer.data, GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, renderer->dbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(GLint)*(renderer->data_buffer.index), renderer->data_buffer.data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(1);
+    glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 0, (void*)0);
+    glVertexAttribDivisor(1, 1);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-
-	renderer_set_clear_color(renderer, 0.0f, 0.0f, 0.0f, 0.0f);
-	glClearColor(renderer->clear_color[0], renderer->clear_color[1], renderer->clear_color[2], renderer->clear_color[3]);
-
-	
-
-	glVertexAttribPointer(0, 3, GL_INT, GL_FALSE, 0, (void*)0);
-	glEnableVertexAttribArray(0);  
+    renderer_set_clear_color(renderer, 0.0f, 0.0f, 0.0f, 0.0f);
+	glClearColor(renderer->clear_color[0],
+              renderer->clear_color[1],
+              renderer->clear_color[2],
+              renderer->clear_color[3]);
 
 	glUseProgram(renderer->program);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
-
 
 	return TRUE;
 }
@@ -118,7 +111,7 @@ static bool _setup(renderer_t *renderer, map_t *map) {
 renderer_t * renderer_create(map_t *map) {
 	renderer_t *renderer = allocate(sizeof(renderer_t));
 
-	if (!_setup(renderer, map)) {
+	if (!setup(renderer, map)) {
 		return NULL;
 	}
 
@@ -128,7 +121,7 @@ renderer_t * renderer_create(map_t *map) {
 
 void renderer_destroy(renderer_t *renderer) {
 	buffer_terminate(renderer->vertex_buffer);
-	buffer_terminate(renderer->element_buffer);
+	buffer_terminate(renderer->data_buffer);
 	deallocate(renderer);
 	log_debug("Renderer destroyed");
 }

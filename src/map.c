@@ -7,7 +7,7 @@ static bool _equation(f32 x, f32 y, f32 z) {
 	//f32 e = ((x*x+y*y-0.85*0.85)*(x*x+y*y-0.85*0.85)+(z*z-1)*(z*z-1))*((z*z+y*y-0.85*0.85)*(z*z+y*y-0.85*0.85)+(x*x-1)*(x*x-1))*((x*x+z*z-0.85*0.85)*(x*x+z*z-0.85*0.85)+(y*y-1)*(y*y-1));
 	
 	f32 e = x*x+y*y+z*z;
-	return fabsf(e) < 1.0f;
+	return fabsf(e) <= 1.0f;
 }
 
 map_t * map_create(void) {
@@ -76,7 +76,7 @@ void map_load(map_t *map) {
 			for(i32 k=-height_2; k<=height_2; k++) {
 				if(_equation(e*i/width_2, e*j/length_2, e*k/height_2)) {
                     map_s(j, k, i, map->cube_buffer.index);
-				    buffer_push(map->cube_buffer, ((cube_t) {j, k, i}));
+				    buffer_push(map->cube_buffer, ((cube_t) {i, k, j}));
 				}
 			}	
 		}
@@ -129,9 +129,9 @@ bool map_verify(i32 x, i32 y, i32 z, map_t *map) {
 }
 
 u32 map_get(i32 x, i32 y, i32 z, map_t *map) {
-    return map->_map[(u32)(map->length * map->height * (x + map->width/2)
+    return map_verify(x, y, z, map) ? map->_map[(u32)(map->length * map->height * (x + map->width/2)
                            + map->length*(y+map->length/2)
-                           + z +map->height/2)];
+                           + z +map->height/2)] : 0;
 }
 
 void map_set(i32 x, i32 y, i32 z, u32 index, map_t *map) {
