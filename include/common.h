@@ -5,6 +5,8 @@
 #error "Requires IEEE 754 floating point!"
 #endif
 
+//TODO add vec3
+
 #include <stddef.h>
 #include <stdint.h>
 #include <sys/types.h>

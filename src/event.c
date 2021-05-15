@@ -1,5 +1,5 @@
-#include "core/event.h"
-#include "core/opengl.h"
+#include "event.h"
+#include "opengl.h"
 
 void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time) {
 	event_data_t *event_data = (event_data_t*)data;
@@ -43,7 +43,7 @@ void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 ti
 }
 
 
-void window_poll_events(window_t *window, matrix_t *perspective) {
+void event_poll_events(window_t *window, matrix_t *perspective) {
 	SDL_Event event;
 	while (SDL_PollEvent(&event)) {
         if (event.type == SDL_QUIT) {
@@ -69,20 +69,17 @@ void window_poll_events(window_t *window, matrix_t *perspective) {
                                  event.key.keysym.sym,
                                  UP,
                                  window->time_ms);
-        } else if (window->enable_cursor) {
-			if (event.type == SDL_MOUSEBUTTONDOWN) {
+        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
 
-			} else if (event.type == SDL_MOUSEMOTION
-					&& window->mouse_move_callback != NULL) {
-				window->mouse_move_callback(
-					window->mouse_move_callback_data,
-					event.motion.xrel,
-					event.motion.yrel,
-					window->time_ms
-				);
-			} else if (event.type == SDL_MOUSEBUTTONUP) {
+        } else if (event.type == SDL_MOUSEMOTION && window->mouse_move_callback != NULL) {
+            window->mouse_move_callback(
+                window->mouse_move_callback_data,
+                event.motion.xrel,
+                event.motion.yrel,
+                window->time_ms
+            );
+        } else if (event.type == SDL_MOUSEBUTTONUP) {
 
-			}
-		}
+        }
 	}
 }

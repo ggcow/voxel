@@ -1,17 +1,12 @@
-#define _POSIX_C_SOURCE 200809L
-
-
 #include <stdio.h>
 
-#include "core/renderer.h"
-#include "core/shader.h"
-#include "draw.h"
+#include "renderer.h"
 
-static bool setup(renderer_t *renderer, map_t *map);
+static bool setup(renderer_t *renderer, chunk_t *chunk);
 
-void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
+void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp, chunk_t *chunk) {
 
-	GLuint MatrixID = glGetUniformLocation(renderer->program, "MVP");
+	GLuint MatrixID = glGetUniformLocation(renderer->shader_program.program, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, (GLfloat *) mvp);
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -19,12 +14,10 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
 	glDrawArraysInstanced(GL_TRIANGLE_STRIP,
                          0,
                          renderer->vertex_buffer.index,
-                         renderer->data_buffer.index/4);
+                         chunk->data_buffer.index/4);
 }
 
-
-
-static bool setup(renderer_t *renderer, map_t *map) {
+static bool setup(renderer_t *renderer, chunk_t *chunk) {
     char vertex_shader_path[200];
     char fragment_shader_path[200];
     strcpy(vertex_shader_path, ROOT_FOLDER);
@@ -38,22 +31,18 @@ static bool setup(renderer_t *renderer, map_t *map) {
         return FALSE;
     }
 
-	renderer->program = create_shader_program(
-            vertex_shader_code,
-            fragment_shader_code
-    );
+    renderer->shader_program = shader_program_make(vertex_shader_code, fragment_shader_code);
+
+    if (renderer->shader_program.program == 0) {
+        log_error("Error while making shader program");
+        return FALSE;
+    }
 
 	deallocate(vertex_shader_code);
 	deallocate(fragment_shader_code);
 
-	if (renderer->program == 0) {
-		return FALSE;
-	}
-
 	buffer_init(renderer->vertex_buffer);
-	buffer_init(renderer->data_buffer);
 
-	draw_cubes(renderer, map);
     buffer_check_size(renderer->vertex_buffer, 8);
     buffer_push(renderer->vertex_buffer, 0); buffer_push(renderer->vertex_buffer, 0);
     buffer_push(renderer->vertex_buffer, 0); buffer_push(renderer->vertex_buffer, 1);
@@ -62,29 +51,32 @@ static bool setup(renderer_t *renderer, map_t *map) {
 
 	glGenVertexArrays(1, &(renderer->vao));
 	glGenBuffers(1, &(renderer->vbo));
-	glGenBuffers(1, &(renderer->dbo));
 
 	glBindVertexArray(renderer->vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLint)*(renderer->vertex_buffer.index), renderer->vertex_buffer.data, GL_STATIC_DRAW);
-    glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, 0, (void*)0);
+	glBufferData(GL_ARRAY_BUFFER,
+              sizeof(GL_INT) * (renderer->vertex_buffer.index),
+              renderer->vertex_buffer.data,
+              GL_STATIC_DRAW);
 
-	glBindBuffer(GL_ARRAY_BUFFER, renderer->dbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(GLint)*(renderer->data_buffer.index), renderer->data_buffer.data, GL_STATIC_DRAW);
+    glEnableVertexAttribArray(0);
+    glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, 0, NULL);
+
+	glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
+	glBufferData(GL_ARRAY_BUFFER,
+              sizeof(GL_INT) * (chunk->data_buffer.index),
+              chunk->data_buffer.data,
+              GL_STATIC_DRAW);
+
     glEnableVertexAttribArray(1);
-    glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 0, (void*)0);
+    glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 0, NULL);
     glVertexAttribDivisor(1, 1);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-    renderer_set_clear_color(renderer, 0.0f, 0.0f, 0.0f, 0.0f);
-	glClearColor(renderer->clear_color[0],
-              renderer->clear_color[1],
-              renderer->clear_color[2],
-              renderer->clear_color[3]);
+	glClearColor(0, 0, 0, 0);
 
-	glUseProgram(renderer->program);
+	glUseProgram(renderer->shader_program.program);
 
 	glEnable(GL_DEPTH_TEST);
 	glDepthFunc(GL_LESS);
@@ -93,10 +85,10 @@ static bool setup(renderer_t *renderer, map_t *map) {
 }
 
 
-renderer_t * renderer_create(map_t *map) {
-	renderer_t *renderer = allocate(sizeof(renderer_t));
+renderer_t * renderer_create(chunk_t *chunk) {
+	renderer_t *renderer = callocate(sizeof(renderer_t), 1);
 
-	if (!setup(renderer, map)) {
+	if (!setup(renderer, chunk)) {
 		return NULL;
 	}
 
@@ -105,18 +97,15 @@ renderer_t * renderer_create(map_t *map) {
 }
 
 void renderer_destroy(renderer_t *renderer) {
+    glUseProgram(0);
+    glBindVertexArray(0);
+    glDisableVertexArrayAttrib(renderer->vao, 0);
+    shader_program_terminate(renderer->shader_program);
 	buffer_terminate(renderer->vertex_buffer);
-	buffer_terminate(renderer->data_buffer);
 	deallocate(renderer);
 	log_debug("Renderer destroyed");
 }
 
-void renderer_set_clear_color(renderer_t *renderer, f32 r, f32 g, f32 b, f32 a) {
-	renderer->clear_color[0] = r;
-	renderer->clear_color[1] = g;
-	renderer->clear_color[2] = b;
-	renderer->clear_color[3] = a;
-}
 
 
 

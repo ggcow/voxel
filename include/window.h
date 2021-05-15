@@ -1,11 +1,11 @@
 #ifndef WINDOW_H
 #define WINDOW_H
 
-#include "core/common.h"
+#include "common.h"
 
 #include <SDL2/SDL.h>
 
-typedef struct {
+typedef struct window_t {
 	SDL_Window *sdl_window;
 	SDL_GLContext *gl_context;
 	u32 width, height;
@@ -16,7 +16,7 @@ typedef struct {
 
 	void (*key_callback)(void *, SDL_KeyCode , enum state, u32);
 	void *key_callback_data;
-	bool enable_cursor;
+
 	f64 time_s;
 	u64 time_delta;
 	u64 time_ms;
@@ -32,8 +32,6 @@ void window_skip_frame(window_t *window);
 
 u32 window_get_width(const window_t *window);
 u32 window_get_height(const window_t *window);
-
-void window_enable_cursor(window_t *window, bool enable);
 
 u64 window_get_time_ms(const window_t *window);
 f64 window_get_time_s(const window_t *window);

@@ -1,9 +1,9 @@
 #ifndef PLAYER_H
 #define PLAYER_H
 
-#include "core/common.h"
+#include "common.h"
 
-typedef struct {
+typedef struct player_t {
 	f32 eye[3];
 
 	f32 inclination;

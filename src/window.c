@@ -1,6 +1,6 @@
-#include "core/window.h"
-#include "core/timer.h"
-#include "core/opengl.h"
+#include "window.h"
+#include "timer.h"
+#include "opengl.h"
 
 static void _update_metrics(window_t *window) {
     static u32 frame_count = 0;
@@ -22,7 +22,7 @@ static void _update_metrics(window_t *window) {
 }
 
 window_t * window_create(u32 width, u32 height) {
-	window_t *window = allocate(sizeof(window_t));
+	window_t *window = callocate(sizeof(window_t), 1);
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 		if (SDL_Init(SDL_INIT_VIDEO) != 0) {
@@ -114,8 +114,7 @@ u32 window_get_height(const window_t *window) {
 }
 
 
-f64 window_get_time_delta(const window_t *window)
-{
+f64 window_get_time_delta(const window_t *window) {
 	return window->time_delta;
 }
 
@@ -141,8 +140,4 @@ void window_set_key_callback(window_t *window,
 	void *data) {
 	window->key_callback = callback;
 	window->key_callback_data = data;
-}
-
-void window_enable_cursor(window_t *window, bool enable) {
-	window->enable_cursor = enable;
 }

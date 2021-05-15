@@ -1,7 +1,7 @@
 #ifndef LOG_H
 #define LOG_H
 
-#include "core/common.h"
+#include "common.h"
 
 void _log_error(const char *filename, u32 line, const char *format, ...);
 void _log_warning(const char *filename, u32 line, const char *format, ...);

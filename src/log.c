@@ -1,6 +1,6 @@
 #define _POSIX_C_SOURCE 200809L
 
-#include "core/log.h"
+#include "log.h"
 
 #include <stdarg.h>
 #include <stdio.h>

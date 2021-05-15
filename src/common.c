@@ -1,5 +1,5 @@
-#include "core/common.h"
-#include "core/log.h"
+#include "common.h"
+#include "log.h"
 
 #include <stdlib.h>
 

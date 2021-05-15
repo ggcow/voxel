@@ -2,14 +2,15 @@
 #define MATRIX_H
 
 #include <math.h>
-#include "core/common.h"
-#include "core/opengl.h"
+#include "common.h"
+#include "opengl.h"
 
 #define radians(d) ((d) * M_PI / 180.0)
 
-typedef struct {
+typedef struct matrix_t {
     GLfloat m[16];
 } matrix_t;
+
 
 #define matrix_identity (matrix_t) {{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}}
 

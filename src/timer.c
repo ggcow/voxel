@@ -1,4 +1,4 @@
-#include "core/timer.h"
+#include "timer.h"
 
 #include <time.h>
 
