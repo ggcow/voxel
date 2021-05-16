@@ -8,5 +8,5 @@ const vec3 bot_color = vec3(143, 152, 144);
 
 void main() {
 	float t = (fragment.y+128)/255;
-	color = (t*top_color+(1-t)*bot_color)/255;
+	color = (t*(top_color*mod(fragment.x, 100)/100)+(1-t)*(bot_color*mod(fragment.z, 100)/100))/255;
 }
