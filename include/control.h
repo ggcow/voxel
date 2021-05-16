@@ -9,21 +9,25 @@
 #include <SDL2/SDL_keycode.h>
 
 enum control_key_t {
-	CONTROL_KEY_FORWARD = 1 << 0,
-	CONTROL_KEY_BACKWARD = 1 << 1,
-	CONTROL_KEY_LEFT = 1 << 2,
-	CONTROL_KEY_RIGHT = 1 << 3,
-	CONTROL_KEY_UP = 1 << 4,
-	CONTROL_KEY_DOWN = 1 << 5,
-	CONTROL_KEY_UNKNOWN = 1 << 6,
+	KEY_FORWARD = 1 << 0,
+	KEY_BACKWARD = 1 << 1,
+	KEY_LEFT = 1 << 2,
+	KEY_RIGHT = 1 << 3,
+	KEY_UP = 1 << 4,
+	KEY_DOWN = 1 << 5,
+
+    KEY_INCREMENT_RENDERING_DISTANCE = 1 << 6,
+    KEY_DECREMENT_RENDERING_DISTANCE = 1 << 7,
+
+	KEY_UNKNOWN = 1 << 8
 };
 
-#define NUMBER_OF_CONTROL_KEYS __builtin_ctz(CONTROL_KEY_UNKNOWN)
+#define NUMBER_OF_CONTROL_KEYS __builtin_ctz(KEY_UNKNOWN)
 
 void control_key_set_defaults(void);
 enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode);
 
-int control_move(player_t *player, u32 keys, f32 delta);
+bool control_move(player_t *player, u32 keys, f32 delta);
 
 
 #endif

@@ -10,8 +10,7 @@
 #define WIDTH 955
 #define HEIGHT 1020
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]) {
 	log_command("2J");
 	log_command("H");
 
@@ -50,6 +49,7 @@ int main(int argc, char *argv[])
 		log_error("Renderer could not be created");
 		goto exit;
 	}
+    renderer_bind_buffers(player);
 
     control_key_set_defaults();
 
@@ -59,16 +59,14 @@ int main(int argc, char *argv[])
 	event_data->close_requested = &(window->close_requested);
 
     matrix_t view, perspective, mvp;
-    renderer_bind_buffers(player);
-
 	while (!window->close_requested) {
         event_poll_events(window, &perspective);
 
-		int directions = control_move(player,
-                                event_data->keys,
-                                (f32)window_get_time_delta(window)/1000000);
-
-		//TODO use directions for chunk check
+		if (control_move(player,
+                   event_data->keys,
+                   (f32)window_get_time_delta(window)/1000000)) {
+            player_set_chunks(player, map);
+		}
 
         view = matrix_lookAt(player->eye, player->look, (f32[3]){0,1,0});
         mvp = matrix_multiply(perspective, view);

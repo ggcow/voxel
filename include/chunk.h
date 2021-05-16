@@ -9,13 +9,6 @@
 #define CHUNK_SIZE 16
 #define MAP_HEIGHT 256
 
-enum {
-    X_MINUS = 1<<0,
-    X_PLUS = 1<<1,
-    Z_MINUS = 1<<2,
-    Z_PLUS = 1<<3
-};
-
 define_buffer_type(cube_t);
 
 typedef struct chunk_t {
@@ -29,9 +22,8 @@ typedef struct chunk_t {
     buffer_type(GLint) data_buffer;
 } chunk_t;
 
-chunk_t * chunk_create(i32 x, i32 z);
+chunk_t * chunk_create(i32 z, i32 x);
 void chunk_destroy(chunk_t *chunk);
 void chunk_gen_map(chunk_t *chunk);
-void chunk_gen_buffer(chunk_t *chunk);
 
 #endif

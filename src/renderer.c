@@ -68,6 +68,8 @@ static bool setup(renderer_t *renderer) {
 
     glEnableVertexAttribArray(0);
     glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, 0, NULL);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 	glClearColor(0, 0, 0, 0);
 
 	glUseProgram(renderer->shader_program.program);

@@ -1,19 +1,11 @@
 #include "list.h"
 
-plist_t plist_create(void *pointer) {
-    plist_t list = allocate(sizeof *list);
-    *list = (struct plist_tt) {pointer};
-    return list;
-}
-
-void plist_destroy(plist_t list) {
-    plist_t last;
-    for (last = list; list; last = list, list = list->next) {
-        if (last != list)
-        deallocate(last);
+void plist_destroy(plist_t *list) {
+    plist_t next;
+    for (; *list; *list = next) {
+        next = (*list)->next;
+        deallocate(*list);
     }
-    if (!last)
-    deallocate(last);
 }
 
 bool plist_contains(plist_t list, void *pointer) {
@@ -25,23 +17,31 @@ bool plist_contains(plist_t list, void *pointer) {
     return FALSE;
 }
 
-void plist_remove(plist_t list, void *pointer) {
-    plist_t last = list;
-    for (void *p = list->value; list; last = list, list = list->next) {
+void plist_remove(plist_t *list, void *pointer) {
+    plist_t last = NULL;
+    plist_t l = *list;
+    for (void *p = l->value; l; last = l, l = l->next, p = l->value) {
         if (p == pointer) {
             if (last) {
-                last->next = list->next;
+                last->next = l->next;
+            } else if (l->next) {
+                *l = *l->next;
             } else {
-                *list = *list->next;
+                *list = NULL;
             }
             break;
         }
     }
 }
 
-void plist_add(plist_t list, void *pointer) {
-    for (; list->next; list = list->next);
+void plist_add(plist_t *list, void *pointer) {
     plist_t new = allocate(sizeof *new);
-    new = (plist_t) {pointer};
-    list->next = new;
+    *new = (struct plist_t) {pointer};
+    if (*list) {
+        plist_t l = *list;
+        for (; l->next; l = l->next);
+        l->next = new;
+    } else {
+        *list = new;
+    }
 }

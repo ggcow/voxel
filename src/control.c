@@ -6,12 +6,14 @@
 int control_key_map[NUMBER_OF_CONTROL_KEYS];
 
 void control_key_set_defaults(void) {
-    KEY(CONTROL_KEY_BACKWARD) = SDLK_s;
-    KEY(CONTROL_KEY_DOWN) = SDLK_LSHIFT;
-    KEY(CONTROL_KEY_FORWARD) = SDLK_z;
-    KEY(CONTROL_KEY_LEFT) = SDLK_q;
-    KEY(CONTROL_KEY_UP) = SDLK_SPACE;
-    KEY(CONTROL_KEY_RIGHT) = SDLK_d;
+    KEY(KEY_BACKWARD) = SDLK_s;
+    KEY(KEY_DOWN) = SDLK_LSHIFT;
+    KEY(KEY_FORWARD) = SDLK_z;
+    KEY(KEY_LEFT) = SDLK_q;
+    KEY(KEY_UP) = SDLK_SPACE;
+    KEY(KEY_RIGHT) = SDLK_d;
+    KEY(KEY_INCREMENT_RENDERING_DISTANCE) = SDLK_p;
+    KEY(KEY_DECREMENT_RENDERING_DISTANCE) = SDLK_m;
 }
 
 enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
@@ -20,7 +22,7 @@ enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
             return (enum control_key_t) 1 << i;
         }
     }
-    return CONTROL_KEY_UNKNOWN;
+    return KEY_UNKNOWN;
 }
 
 #undef KEY
@@ -30,11 +32,28 @@ enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
  * @param player
  * @param keys
  * @param delta
- * @return FLAGS if player changed chunk
+ * @return TRUE if player changed chunk
  */
-int control_move(player_t *player, u32 keys, f32 delta) {
-    i32 last_x = (int) player->eye[0];
-    i32 last_z = (int) player->eye[2];
+bool control_move(player_t *player, u32 keys, f32 delta) {
+    bool refresh_chunks = FALSE;
+    if (!(keys & KEY_INCREMENT_RENDERING_DISTANCE) != !(keys & KEY_DECREMENT_RENDERING_DISTANCE)) {
+        if (keys & KEY_INCREMENT_RENDERING_DISTANCE) {
+            player->rendering_distance += 0.1f;
+            if (player->rendering_distance > 10) {
+                player->rendering_distance = 10;
+            }
+        } else {
+            player->rendering_distance -= 0.1f;
+            if (player->rendering_distance < 0) {
+                player->rendering_distance = 0;
+            }
+        }
+        log_info("rendering distance : %f", player->rendering_distance);
+        refresh_chunks = TRUE;
+    }
+
+    i32 last_chunk_x = player->chunk_x;
+    i32 last_chunk_z = player->chunk_z;
 
     f32 direction[2];
     direction[0] = player->look[0];
@@ -48,8 +67,8 @@ int control_move(player_t *player, u32 keys, f32 delta) {
         direction[1] /= n;
     }
 
-    if (!(keys & CONTROL_KEY_FORWARD) != !(keys & CONTROL_KEY_BACKWARD)) {
-        if (keys & CONTROL_KEY_FORWARD) {
+    if (!(keys & KEY_FORWARD) != !(keys & KEY_BACKWARD)) {
+        if (keys & KEY_FORWARD) {
             player->eye[2] += direction[1] * delta * player->speed;
             player->eye[0] += direction[0] * delta * player->speed;
         } else {
@@ -58,8 +77,8 @@ int control_move(player_t *player, u32 keys, f32 delta) {
         }
     }
 
-    if (!(keys & CONTROL_KEY_LEFT) != !(keys & CONTROL_KEY_RIGHT)) {
-        if (keys & CONTROL_KEY_LEFT) {
+    if (!(keys & KEY_LEFT) != !(keys & KEY_RIGHT)) {
+        if (keys & KEY_LEFT) {
             player->eye[0] += direction[1] * delta * player->speed;
             player->eye[2] -= direction[0] * delta * player->speed;
         } else {
@@ -68,26 +87,18 @@ int control_move(player_t *player, u32 keys, f32 delta) {
         }
     }
 
-    if (!(keys & CONTROL_KEY_UP) != !(keys & CONTROL_KEY_DOWN)) {
-        if (keys & CONTROL_KEY_DOWN) {
+    if (!(keys & KEY_UP) != !(keys & KEY_DOWN)) {
+        if (keys & KEY_DOWN) {
             player->eye[1] -= 0.5f * delta * player->speed;;
         } else {
             player->eye[1] += 0.5f * delta * player->speed;;
         }
     }
 
-    int directions = 0;
+    player->chunk_x = floorf(player->eye[0] / CHUNK_SIZE);
+    player->chunk_z = floorf(player->eye[2] / CHUNK_SIZE);
 
-    i32 x = (int) player->look[0];
-    i32 z = (int) player->look[2];
+    refresh_chunks |= player->chunk_x != last_chunk_x || player->chunk_z != last_chunk_z;
 
-    if (x / CHUNK_SIZE != last_x / CHUNK_SIZE) {
-        directions |= x < last_x ? X_MINUS : X_PLUS;
-    }
-
-    if (z / CHUNK_SIZE != last_z / CHUNK_SIZE) {
-        directions |= z < last_z ? Z_MINUS : Z_PLUS;
-    }
-
-    return directions;
+    return refresh_chunks;
 }

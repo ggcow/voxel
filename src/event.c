@@ -24,7 +24,7 @@ void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 ti
 	event_data_t *event_data = (event_data_t*)data;
 
 	enum control_key_t key = control_key_from_sdl_keycode(key_code);
-	if (key != CONTROL_KEY_UNKNOWN) {
+	if (key != KEY_UNKNOWN) {
         if(key_state == DOWN) {
             event_data->keys |= key;
         } else {
