@@ -11,8 +11,8 @@ static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk);
 static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
 
 static bool equation(i32 x, i32 y, i32 z) {
-    f32 e = x*x+y*y+z*z;
-    return fabsf(e) <= 100.0f;
+    f32 e = sin(M_PI*sqrt(x*x+z*z)/100);
+    return y <= fabsf(e);
 }
 
 chunk_t * chunk_create(i32 x, i32 z) {
@@ -30,13 +30,14 @@ chunk_t * chunk_create(i32 x, i32 z) {
 void chunk_destroy(chunk_t *chunk) {
     buffer_terminate(chunk->data_buffer);
     buffer_terminate(chunk->cube_buffer);
-    deallocate(chunk->map);
+    if (chunk->map) deallocate(chunk->map);
     deallocate(chunk);
 }
 
 void chunk_gen_map(chunk_t *chunk) {
     if (chunk->map) return;
-    chunk->map = callocate(sizeof(u32), CHUNK_SIZE * CHUNK_SIZE * MAP_HEIGHT);
+    chunk->map = callocate(sizeof(u32) * CHUNK_SIZE * CHUNK_SIZE * MAP_HEIGHT);
+    chunk->map += MAP_HEIGHT/2;
 
     for (i32 i=0; i<CHUNK_SIZE; i++) {
         for (i32 j=-MAP_HEIGHT/2; j<MAP_HEIGHT/2; j++) {
@@ -61,21 +62,21 @@ void chunk_gen_buffer(chunk_t *chunk) {
 
         for (int i=-1; i<2; i+=2) {
             if (!map_g(x+i, y, z)) {
-                buffer_push(chunk->data_buffer, x+(i+1)/2);
+                buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE + (i+1)/2);
                 buffer_push(chunk->data_buffer, y);
-                buffer_push(chunk->data_buffer, z);
+                buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE);
                 buffer_push(chunk->data_buffer, 0);
             }
             if (!map_g(x, y+i, z)) {
-                buffer_push(chunk->data_buffer, x);
-                buffer_push(chunk->data_buffer, y+(i+1)/2);
-                buffer_push(chunk->data_buffer, z+1);
+                buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE);
+                buffer_push(chunk->data_buffer, y + (i+1)/2);
+                buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE + 1);
                 buffer_push(chunk->data_buffer, 1);
             }
             if (!map_g(x, y, z+i)) {
-                buffer_push(chunk->data_buffer, x);
+                buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE);
                 buffer_push(chunk->data_buffer, y);
-                buffer_push(chunk->data_buffer, z+(i+1)/2);
+                buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE +(i+1)/2);
                 buffer_push(chunk->data_buffer, 2);
             }
         }
@@ -90,9 +91,9 @@ static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk) {
 
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk) {
     return map_verify(x, y, z, chunk) ?
-    chunk->map[(u32)(CHUNK_SIZE * MAP_HEIGHT * x + CHUNK_SIZE * (y + MAP_HEIGHT/2) + z)] : 0;
+    chunk->map[CHUNK_SIZE * MAP_HEIGHT * x + MAP_HEIGHT * z + y] : 0;
 }
 
 static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk) {
-    chunk->map[(u32)(CHUNK_SIZE * MAP_HEIGHT * x + CHUNK_SIZE * (y + MAP_HEIGHT/2) + z)] = index;
+    chunk->map[CHUNK_SIZE * MAP_HEIGHT * x + MAP_HEIGHT * z + y] = index;
 }

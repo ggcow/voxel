@@ -5,7 +5,7 @@
 
 int control_key_map[NUMBER_OF_CONTROL_KEYS];
 
-void control_key_set_defaults() {
+void control_key_set_defaults(void) {
     KEY(CONTROL_KEY_BACKWARD) = SDLK_s;
     KEY(CONTROL_KEY_DOWN) = SDLK_LSHIFT;
     KEY(CONTROL_KEY_FORWARD) = SDLK_z;

@@ -16,36 +16,37 @@ int main(int argc, char *argv[])
 	log_command("H");
 
 	window_t *window = NULL;
+	map_t *map = NULL;
 	player_t *player = NULL;
     event_data_t *event_data = NULL;
     renderer_t *renderer = NULL;
 
-    pbuffer_t chunk_buffer = pbuffer_make((void (*)(void *)) chunk_destroy);
-
 	window = window_create(WIDTH, HEIGHT);
-	if (window == NULL) {
+	if (!window) {
 		log_error("Window could not be created");
 		goto exit;
 	}
 
-	player = player_create();
-	if (player == NULL) {
+	map = map_create();
+	if (!map) {
+	    log_error("Map count not be created");
+	    goto exit;
+	}
+
+	player = player_create(map);
+	if (!player) {
 		log_error("Player could not be created");
 		goto exit;
 	}
 
 	event_data = event_data_create(player);
-	if (event_data == NULL) {
+	if (!event_data) {
 		log_error("Event data could not be created");
 		goto exit;
 	}
 
-	buffer_push(chunk_buffer, chunk_create(0, 0));
-	chunk_gen_map(chunk_buffer.data[0]);
-	chunk_gen_buffer(chunk_buffer.data[0]);
-
-	renderer = renderer_create(chunk_buffer.data[0]);
-	if (renderer == NULL) {
+	renderer = renderer_create();
+	if (!renderer) {
 		log_error("Renderer could not be created");
 		goto exit;
 	}
@@ -58,6 +59,7 @@ int main(int argc, char *argv[])
 	event_data->close_requested = &(window->close_requested);
 
     matrix_t view, perspective, mvp;
+    renderer_bind_buffers(player);
 
 	while (!window->close_requested) {
         event_poll_events(window, &perspective);
@@ -71,7 +73,7 @@ int main(int argc, char *argv[])
         view = matrix_lookAt(player->eye, player->look, (f32[3]){0,1,0});
         mvp = matrix_multiply(perspective, view);
 
-		renderer_draw(renderer, player, &mvp, chunk_buffer.data[0]);
+		renderer_draw(renderer, player, &mvp);
 		window_swap(window);
 	}
 
@@ -80,8 +82,8 @@ int main(int argc, char *argv[])
 	if (renderer) renderer_destroy(renderer);
 	if (event_data)	event_data_destroy(event_data);
 	if (player)	player_destroy(player);
+	if (map) map_destroy(map);
 	if (window)	window_destroy(window);
-    pbuffer_terminate(chunk_buffer);
 	return 0;
 }
 

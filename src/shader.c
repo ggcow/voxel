@@ -13,7 +13,7 @@ char * shader_load_from_file(char *path) {
     fseek(f, 0, SEEK_END);
     long length = ftell(f);
     rewind(f);
-    char *shader = callocate(1, length+1);
+    char *shader = callocate(length+1);
     fread(shader, 1, length, f);
     fclose(f);
     return shader;
@@ -45,7 +45,8 @@ static GLuint create_shader(GLenum shader_type, const GLchar *shader_source) {
     return shader;
 }
 
-shader_program_t shader_program_make(const GLchar *vertex_shader_source, const GLchar *fragment_shader_source) {
+shader_program_t shader_program_make(const GLchar *vertex_shader_source,
+                                     const GLchar *fragment_shader_source) {
     GLuint program = 0;
 
     GLuint vertex_shader = create_shader(GL_VERTEX_SHADER, vertex_shader_source);

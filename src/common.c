@@ -13,8 +13,8 @@ void * _allocate(const char *filename, u32 line, usize size) {
 	return pointer;
 }
 
-void * _callocate(const char *filename, u32 line, usize size, usize count) {
-    void *pointer = calloc(size, count);
+void * _callocate(const char *filename, u32 line, usize size) {
+    void *pointer = calloc(1, size);
 
     if (pointer == NULL) {
         log_error("Allocation failed in %s:%d", filename, line);
@@ -39,14 +39,4 @@ void _deallocate(const char *filename, u32 line, void *pointer) {
 	} else {
 		free(pointer);
 	}
-}
-
-u32 string_compare(const char *left, const char *right) {
-	usize i = 0;
-
-	while (left[i] != 0 && right[i] != 0 && left[i] == right[i]) {
-		i++;
-	}
-
-	return left[i] < right[i] ? -1 : left[i] > right[i] ? 1 : 0;
 }

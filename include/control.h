@@ -20,7 +20,7 @@ enum control_key_t {
 
 #define NUMBER_OF_CONTROL_KEYS __builtin_ctz(CONTROL_KEY_UNKNOWN)
 
-void control_key_set_defaults();
+void control_key_set_defaults(void);
 enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode);
 
 int control_move(player_t *player, u32 keys, f32 delta);

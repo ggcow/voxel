@@ -42,25 +42,19 @@ enum state {
 };
 
 #ifndef NULL
-#define NULL 0
+#define NULL ((void *) 0)
 #endif
 
 void * _allocate(const char *filename, u32 line, usize size);
-void *_callocate(const char *filename, u32 line, usize size, usize count);
+void * _callocate(const char *filename, u32 line, usize size);
 void * _reallocate(const char *filename, u32 line, void *pointer, usize size);
 void _deallocate(const char *filename, u32 line, void *pointer);
 
 
+#define allocate(...) _allocate(__FILE__, __LINE__, __VA_ARGS__)
+#define callocate(...) _callocate(__FILE__, __LINE__, __VA_ARGS__)
+#define reallocate(...) _reallocate(__FILE__, __LINE__, __VA_ARGS__)
+#define deallocate(...) _deallocate(__FILE__, __LINE__, __VA_ARGS__)
 
-#define allocate(...) \
-	_allocate(__FILE__, __LINE__, __VA_ARGS__)
-#define callocate(...) \
-	_callocate(__FILE__, __LINE__, __VA_ARGS__)
-#define reallocate(...) \
-	_reallocate(__FILE__, __LINE__, __VA_ARGS__)
-#define deallocate(...) \
-	_deallocate(__FILE__, __LINE__, __VA_ARGS__)
-
-u32 string_compare(const char *left, const char *right);
 #include "log.h"
 #endif

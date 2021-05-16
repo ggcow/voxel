@@ -7,7 +7,7 @@ void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time) {
 }
 
 event_data_t * event_data_create(player_t *player) {
-	event_data_t *event_data = allocate(sizeof(event_data_t));
+	event_data_t *event_data = callocate(sizeof(event_data_t));
 	event_data->keys=0;
 	event_data->player_adress=player;
 	log_debug("Event data created");

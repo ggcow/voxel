@@ -22,7 +22,7 @@ static void _update_metrics(window_t *window) {
 }
 
 window_t * window_create(u32 width, u32 height) {
-	window_t *window = callocate(sizeof(window_t), 1);
+	window_t *window = callocate(sizeof(window_t));
 
 	if (SDL_WasInit(SDL_INIT_VIDEO) == 0) {
 		if (SDL_Init(SDL_INIT_VIDEO) != 0) {

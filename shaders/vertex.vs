@@ -9,9 +9,9 @@ layout(location = 0) in vec2 vertex_position;
 layout(location = 1) in vec4 vertex_data;
 
 uniform mat4 MVP;
-out vec3 fragmentColor;
+out vec3 fragment;
 
 void main(){
 	gl_Position =  MVP * vec4(M[int(vertex_data.w)] * vec3(vertex_position,0)+vertex_data.xyz,1);
-	fragmentColor = vertex_data.xyz;
+	fragment = vertex_data.xyz;
 }

@@ -8,7 +8,9 @@ pbuffer_t pbuffer_make(void (*data_destroy)(void *)) {
 
 void pbuffer_terminate(pbuffer_t buffer) {
     for (int i=0; i<buffer.index; i++) {
-        buffer.data_destroy(buffer.data[i]);
+        if (buffer.data[i]) {
+            buffer.data_destroy(buffer.data[i]);
+        }
     }
     deallocate(buffer.data);
 }
