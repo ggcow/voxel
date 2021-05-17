@@ -31,6 +31,7 @@ void player_destroy(player_t *player) {
 }
 
 void player_set_chunks(player_t *player, map_t *map) {
+    // TODO save the indices around circle when updating rendering distance
     for (int i=-(int)ceilf(player->rendering_distance)-1; i<=(int)ceilf(player->rendering_distance)+1; i++) {
         for (int j=-(int)ceilf(player->rendering_distance)-1; j<=(int)ceilf(player->rendering_distance)+1; j++) {
             chunk_t *chunk = map_chunk_get(i+player->chunk->z, j+player->chunk->x, map);
