@@ -25,5 +25,6 @@ typedef struct chunk_t {
 chunk_t * chunk_create(i32 z, i32 x);
 void chunk_destroy(chunk_t *chunk);
 void chunk_gen_map(chunk_t *chunk);
+void chunk_gen_buffer(chunk_t *chunk);
 
 #endif

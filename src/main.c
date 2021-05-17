@@ -49,6 +49,7 @@ int main(int argc, char *argv[]) {
 		log_error("Renderer could not be created");
 		goto exit;
 	}
+	player_set_chunks(player, map);
     renderer_bind_buffers(player);
 
     control_key_set_defaults();

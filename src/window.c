@@ -2,7 +2,7 @@
 #include "timer.h"
 #include "opengl.h"
 
-static void _update_metrics(window_t *window) {
+static void update_metrics(window_t *window) {
     static u32 frame_count = 0;
     static f64 frame_start_time = 0;
 
@@ -72,7 +72,7 @@ window_t * window_create(u32 width, u32 height) {
 		log_debug("OpenGL context created: %s", glGetString(GL_VERSION));
 	}
 
-	_update_metrics(window);
+    update_metrics(window);
 
 	window->width = width;
 	window->height = height;
@@ -97,12 +97,12 @@ void window_destroy(window_t *window) {
 
 void window_swap(window_t *window) {
 	SDL_GL_SwapWindow(window->sdl_window);
-	_update_metrics(window);
+    update_metrics(window);
 }
 
 void window_skip_frame(window_t *window) {
 	SDL_WaitEvent(NULL);
-	_update_metrics(window);
+    update_metrics(window);
 }
 
 u32 window_get_width(const window_t *window) {

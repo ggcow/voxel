@@ -6,8 +6,6 @@ static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk);
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk);
 static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
 
-static void chunk_gen_buffer(chunk_t *chunk);
-
 static bool equation(i32 x, i32 y, i32 z) {
     f32 e = 30*sin(M_PI*sqrt(x*x+z*z)/80);
     return y <= fabsf(e);
@@ -50,10 +48,9 @@ void chunk_gen_map(chunk_t *chunk) {
             }
         }
     }
-    chunk_gen_buffer(chunk);
 }
 
-static void chunk_gen_buffer(chunk_t *chunk) {
+void chunk_gen_buffer(chunk_t *chunk) {
     for (int index=1; index<chunk->cube_buffer.index; index++) {
         buffer_check_size(chunk->data_buffer, 2*3*4);
 

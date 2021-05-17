@@ -18,7 +18,6 @@ map_t * map_create(void) {
             map_chunk_set(z, x, chunk_create(z, x), map);
         }
     }
-    chunk_gen_map(map->chunk00);
     return map;
 }
 
