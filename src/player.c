@@ -9,8 +9,7 @@ player_t * player_create(map_t *map) {
 	player->eye[1]=20.0f;
 	player->eye[2]=CHUNK_SIZE/2;
 
-	player->chunk_x = 0;
-	player->chunk_z = 0;
+	player->chunk = map->chunk00;
 
 	player->inclination=0.0f;
 	player->azimuth=0.0f;
@@ -34,7 +33,7 @@ void player_destroy(player_t *player) {
 void player_set_chunks(player_t *player, map_t *map) {
     for (int i=-(int)player->rendering_distance-1; i<=(int)player->rendering_distance+1; i++) {
         for (int j=-(int)player->rendering_distance-1; j<=(int)player->rendering_distance+1; j++) {
-            chunk_t *chunk = map_chunk_get(i+player->chunk_z, j+player->chunk_x, map);
+            chunk_t *chunk = map_chunk_get(i+player->chunk->z, j+player->chunk->x, map);
             if (i*i+j*j<=(int)(player->rendering_distance*player->rendering_distance)) {
                 if (!plist_contains(player->chunk_list, chunk)) {
                     plist_add(&player->chunk_list, chunk);

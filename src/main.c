@@ -58,12 +58,15 @@ int main(int argc, char *argv[]) {
 	window_set_mouse_move_callback(window, mouse_move_callback, event_data);
 
 	event_data->close_requested = &(window->close_requested);
-
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
     matrix_t view, perspective, mvp;
 	while (!window->close_requested) {
         event_poll_events(window, &perspective);
 
 		if (control_move(player,
+                   map,
                    event_data->keys,
                    (f32)window_get_time_delta(window)/1000000)) {
             player_set_chunks(player, map);

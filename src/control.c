@@ -12,8 +12,8 @@ void control_key_set_defaults(void) {
     KEY(KEY_LEFT) = SDLK_q;
     KEY(KEY_UP) = SDLK_SPACE;
     KEY(KEY_RIGHT) = SDLK_d;
-    KEY(KEY_INCREMENT_RENDERING_DISTANCE) = SDLK_p;
-    KEY(KEY_DECREMENT_RENDERING_DISTANCE) = SDLK_m;
+    KEY(KEY_RENDERING_DISTANCE_PLUS) = SDLK_p;
+    KEY(KEY_RENDERING_DISTANCE_MINUS) = SDLK_m;
 }
 
 enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
@@ -30,14 +30,18 @@ enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
 /**
  * Updates the player's look and direction vectors
  * @param player
+ * @param map
  * @param keys
  * @param delta
  * @return TRUE if player changed chunk
  */
-bool control_move(player_t *player, u32 keys, f32 delta) {
+bool control_move(player_t *player, map_t *map, u32 keys, f32 delta) {
+    static u32 last_keys = 0;
+    static chunk_t  *last_chunk = NULL;
+
     bool refresh_chunks = FALSE;
-    if (!(keys & KEY_INCREMENT_RENDERING_DISTANCE) != !(keys & KEY_DECREMENT_RENDERING_DISTANCE)) {
-        if (keys & KEY_INCREMENT_RENDERING_DISTANCE) {
+    if (!(keys & KEY_RENDERING_DISTANCE_PLUS) != !(keys & KEY_RENDERING_DISTANCE_MINUS)) {
+        if (keys & KEY_RENDERING_DISTANCE_PLUS) {
             player->rendering_distance += 0.1f;
             if (player->rendering_distance > 100) {
                 player->rendering_distance = 100;
@@ -51,9 +55,6 @@ bool control_move(player_t *player, u32 keys, f32 delta) {
         log_info("rendering distance : %f", player->rendering_distance);
         refresh_chunks = TRUE;
     }
-
-    i32 last_chunk_x = player->chunk_x;
-    i32 last_chunk_z = player->chunk_z;
 
     f32 direction[2];
     direction[0] = player->look[0];
@@ -95,10 +96,18 @@ bool control_move(player_t *player, u32 keys, f32 delta) {
         }
     }
 
-    player->chunk_x = floorf(player->eye[0] / CHUNK_SIZE);
-    player->chunk_z = floorf(player->eye[2] / CHUNK_SIZE);
+    /* Only reload chunks when key released
+    refresh_chunks |= ((last_keys & KEY_RENDERING_DISTANCE_PLUS) && !(keys & KEY_RENDERING_DISTANCE_PLUS))
+            || ((last_keys & KEY_RENDERING_DISTANCE_MINUS) && !(keys & KEY_RENDERING_DISTANCE_MINUS));
+    */
 
-    refresh_chunks |= player->chunk_x != last_chunk_x || player->chunk_z != last_chunk_z;
+    player->chunk = map_chunk_get(floorf(player->eye[2] / CHUNK_SIZE),
+                                  floorf(player->eye[0] / CHUNK_SIZE),
+                                  map);
 
+    refresh_chunks |= player->chunk != last_chunk;
+
+    last_keys = keys;
+    last_chunk = player->chunk;
     return refresh_chunks;
 }

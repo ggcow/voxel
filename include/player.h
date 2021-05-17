@@ -15,8 +15,7 @@ typedef struct player_t {
 
 	f32 speed;
 
-	i32 chunk_x;
-	i32 chunk_z;
+	chunk_t *chunk;
 
     f32 rendering_distance;
 	plist_t chunk_list;
