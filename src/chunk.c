@@ -8,7 +8,7 @@ static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
 static bool there_is_cube(i32 x, i32 y, i32 z, chunk_t *chunk, map_t *map);
 
 static bool equation(i32 x, i32 y, i32 z) {
-    f32 e = 30*sin(M_PI*sqrt(x*x+z*z)/80);
+    f32 e = 30*sin(M_PI*sqrt(x*x+z*z)/85);
     return y <= fabsf(e);
 }
 
@@ -18,21 +18,33 @@ chunk_t * chunk_create(i32 z, i32 x) {
     chunk->z = z;
     glGenBuffers(1, &chunk->vbo);
     chunk->map = NULL;
-    buffer_init(chunk->cube_buffer);
-    buffer_init(chunk->data_buffer);
-    chunk->cube_buffer.index = 1;
+    chunk->data_buffer.data = NULL;
+    chunk->cube_buffer.data = NULL;
     return chunk;
 }
 
 void chunk_destroy(chunk_t *chunk) {
-    buffer_terminate(chunk->data_buffer);
-    buffer_terminate(chunk->cube_buffer);
-    if (chunk->map) deallocate(chunk->map-MAP_HEIGHT/2);
+    chunk_free_buffer(chunk);
+    chunk_free_map(chunk);
     deallocate(chunk);
 }
 
+void chunk_free_map(chunk_t *chunk) {
+    buffer_terminate(chunk->cube_buffer);
+    if (chunk->map) deallocate(chunk->map-MAP_HEIGHT/2);
+    chunk->map = NULL;
+    chunk->cube_buffer.index = 1;
+}
+
+void chunk_free_buffer(chunk_t *chunk) {
+    buffer_terminate(chunk->data_buffer);
+    chunk->data_buffer.index = 0;
+}
+
 void chunk_gen_map(chunk_t *chunk) {
-    if (chunk->map) return;
+    if (chunk->cube_buffer.index > 1) return;
+    buffer_init(chunk->cube_buffer);
+    chunk->cube_buffer.index = 1;
     chunk->map = allocate(sizeof(u32) * CHUNK_SIZE * CHUNK_SIZE * MAP_HEIGHT);
     chunk->map += MAP_HEIGHT/2;
 
@@ -52,6 +64,8 @@ void chunk_gen_map(chunk_t *chunk) {
 }
 
 void chunk_gen_buffer(chunk_t *chunk, map_t *map) {
+    if (chunk->data_buffer.index > 0) return;
+    buffer_init(chunk->data_buffer);
     for (int index=1; index<chunk->cube_buffer.index; index++) {
         buffer_check_size(chunk->data_buffer, 2*3*4);
 

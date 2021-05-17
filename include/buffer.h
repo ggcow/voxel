@@ -26,7 +26,9 @@ while (buffer.index + added_size >= buffer.size) {                              
 }
 
 #define buffer_push(buffer, value) buffer.data[buffer.index++] = value
-#define buffer_terminate(buffer) deallocate(buffer.data);
+#define buffer_terminate(buffer)                                                                \
+if (buffer.data) deallocate(buffer.data);                                                       \
+buffer.data = NULL;
 
 typedef struct pbuffer_t {
     void (*data_destroy)(void *);

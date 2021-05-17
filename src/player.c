@@ -31,8 +31,8 @@ void player_destroy(player_t *player) {
 }
 
 void player_set_chunks(player_t *player, map_t *map) {
-    for (int i=-(int)player->rendering_distance-1; i<=(int)player->rendering_distance+1; i++) {
-        for (int j=-(int)player->rendering_distance-1; j<=(int)player->rendering_distance+1; j++) {
+    for (int i=-(int)ceilf(player->rendering_distance)-1; i<=(int)ceilf(player->rendering_distance)+1; i++) {
+        for (int j=-(int)ceilf(player->rendering_distance)-1; j<=(int)ceilf(player->rendering_distance)+1; j++) {
             chunk_t *chunk = map_chunk_get(i+player->chunk->z, j+player->chunk->x, map);
             if (i*i+j*j<=(int)(player->rendering_distance*player->rendering_distance)) {
                 if (!plist_contains(player->chunk_list, chunk)) {
@@ -44,9 +44,12 @@ void player_set_chunks(player_t *player, map_t *map) {
                 if (plist_contains(player->chunk_list, chunk)) {
                     plist_remove(&player->chunk_list, chunk);
                 }
+                chunk_free_map(chunk);
+                chunk_free_buffer(chunk);
             }
         }
     }
+    // free map inside circle offset 1
     renderer_bind_buffers(player);
 }
 
