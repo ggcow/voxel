@@ -58,7 +58,7 @@ void event_poll_events(window_t *window, matrix_t *perspective) {
             *perspective = matrix_perspective(radians(90.0f),
                                               (f32) window->width/window->height,
                                               0.1f,
-                                              1000.0f);
+                                              10000.0f);
         } else if (event.type == SDL_KEYDOWN && window->key_callback) {
                 window->key_callback(window->key_callback_data,
                                      event.key.keysym.sym,

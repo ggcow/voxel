@@ -39,8 +39,8 @@ bool control_move(player_t *player, u32 keys, f32 delta) {
     if (!(keys & KEY_INCREMENT_RENDERING_DISTANCE) != !(keys & KEY_DECREMENT_RENDERING_DISTANCE)) {
         if (keys & KEY_INCREMENT_RENDERING_DISTANCE) {
             player->rendering_distance += 0.1f;
-            if (player->rendering_distance > 10) {
-                player->rendering_distance = 10;
+            if (player->rendering_distance > 100) {
+                player->rendering_distance = 100;
             }
         } else {
             player->rendering_distance -= 0.1f;

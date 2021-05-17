@@ -115,9 +115,6 @@ static void cross(f32 x[3], f32 y[3], f32 *cross)
     cross[2] = x[0] * y[1] - x[1] * y[0];
 }
 
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wunused-function"
-
 void matrix_display(matrix_t matrix) {
 	fprintf(stderr, "\n\n╭───────────────────────────────────────────────╮");
 	for(int i=0; i<4; i++) {
@@ -130,7 +127,5 @@ void matrix_display(matrix_t matrix) {
 	}
 	fprintf(stderr, "\n\n");
 }
-
-#pragma GCC diagnostic pop
 
 //╭╮╰╯ │

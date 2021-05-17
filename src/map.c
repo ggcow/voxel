@@ -6,7 +6,7 @@ static i32 abs(i32 x) {
 
 map_t * map_create(void) {
     map_t *map = callocate(sizeof(map_t));
-    map->size = 255;
+    map->size = 1001;
     for (u32 i=0; i<4; i++) {
         map->chunks[i] = callocate((map->size/2+1) * sizeof(chunk_t ***));
         for (u32 j=0; j<map->size/2+1; j++) {

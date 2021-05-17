@@ -11,7 +11,6 @@ struct plist_t {
 
 
 
-plist_t plist_create(void *pointer);
 void plist_destroy(plist_t *list);
 
 bool plist_contains(plist_t list, void *pointer);

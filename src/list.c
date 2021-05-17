@@ -1,11 +1,13 @@
 #include "list.h"
 
 void plist_destroy(plist_t *list) {
-    plist_t next;
-    for (; *list; *list = next) {
+    //TODO FIX MEMORY LEAK
+    plist_t next = *list;
+    for (; next; *list = next) {
         next = (*list)->next;
         deallocate(*list);
     }
+    *list = NULL;
 }
 
 bool plist_contains(plist_t list, void *pointer) {
@@ -24,9 +26,12 @@ void plist_remove(plist_t *list, void *pointer) {
         if (p == pointer) {
             if (last) {
                 last->next = l->next;
+                deallocate(l);
             } else if (l->next) {
-                *l = *l->next;
+                *list = l->next;
+                deallocate(l);
             } else {
+                deallocate(*list);
                 *list = NULL;
             }
             break;
