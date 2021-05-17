@@ -5,6 +5,7 @@
 static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk);
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk);
 static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
+static bool there_is_cube(i32 x, i32 y, i32 z, chunk_t *chunk, map_t *map);
 
 static bool equation(i32 x, i32 y, i32 z) {
     f32 e = 30*sin(M_PI*sqrt(x*x+z*z)/80);
@@ -50,7 +51,7 @@ void chunk_gen_map(chunk_t *chunk) {
     }
 }
 
-void chunk_gen_buffer(chunk_t *chunk) {
+void chunk_gen_buffer(chunk_t *chunk, map_t *map) {
     for (int index=1; index<chunk->cube_buffer.index; index++) {
         buffer_check_size(chunk->data_buffer, 2*3*4);
 
@@ -59,19 +60,19 @@ void chunk_gen_buffer(chunk_t *chunk) {
         i32 z = chunk->cube_buffer.data[index].z;
 
         for (int i=-1; i<2; i+=2) {
-            if (!map_get(x+i, y, z, chunk)) {
+            if (!there_is_cube(x+i, y, z, chunk, map)) {
                 buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE + (i+1)/2);
                 buffer_push(chunk->data_buffer, y);
                 buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE);
                 buffer_push(chunk->data_buffer, 0);
             }
-            if (!map_get(x, y+i, z, chunk)) {
+            if (!there_is_cube(x, y+i, z, chunk, map)) {
                 buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE);
                 buffer_push(chunk->data_buffer, y + (i+1)/2);
                 buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE + 1);
                 buffer_push(chunk->data_buffer, 1);
             }
-            if (!map_get(x, y, z+i, chunk)) {
+            if (!there_is_cube(x, y, z+i, chunk, map)) {
                 buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE);
                 buffer_push(chunk->data_buffer, y);
                 buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE +(i+1)/2);
@@ -81,6 +82,38 @@ void chunk_gen_buffer(chunk_t *chunk) {
     }
 }
 
+chunk_t * map_chunk_get(i32 z, i32 x, map_t *);
+
+static bool there_is_cube(i32 x, i32 y, i32 z, chunk_t *chunk, map_t *map) {
+    if (MAP_HEIGHT/2 <= y) return FALSE;
+    if (y < -MAP_HEIGHT/2) return TRUE;
+    if (0 <= z && z < CHUNK_SIZE && 0 <= x && x < CHUNK_SIZE) {
+        return map_get(x, y, z, chunk) > 0;
+    }
+    chunk_t *target_chunk;
+    if (x<0) {
+        target_chunk = map_chunk_get(chunk->z, chunk->x-1, map);
+        chunk_gen_map(target_chunk);
+        return map_get(CHUNK_SIZE-1, y, z, target_chunk);
+    }
+    if (x>=CHUNK_SIZE) {
+        target_chunk = map_chunk_get(chunk->z, chunk->x+1, map);
+        chunk_gen_map(target_chunk);
+        return map_get(0, y, z, target_chunk);
+    }
+    if (z<0) {
+        target_chunk = map_chunk_get(chunk->z-1, chunk->x, map);
+        chunk_gen_map(target_chunk);
+        return map_get(x, y, CHUNK_SIZE-1, target_chunk);
+    }
+    if (z>=CHUNK_SIZE) {
+        target_chunk = map_chunk_get(chunk->z+1, chunk->x, map);
+        chunk_gen_map(target_chunk);
+        return map_get(x, y, 0, target_chunk);
+    }
+    log_error("no return in there_is_cube");
+}
+
 static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk) {
     return -MAP_HEIGHT/2 <= y && y < MAP_HEIGHT/2
             && 0 <= z && z < CHUNK_SIZE
@@ -88,8 +121,7 @@ static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk) {
 }
 
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk) {
-    return map_verify(x, y, z, chunk) ?
-    chunk->map[CHUNK_SIZE * MAP_HEIGHT * x + MAP_HEIGHT * z + y] : 0;
+    return chunk->map[CHUNK_SIZE * MAP_HEIGHT * x + MAP_HEIGHT * z + y];
 }
 
 static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk) {

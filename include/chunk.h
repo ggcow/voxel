@@ -22,9 +22,11 @@ typedef struct chunk_t {
     buffer_type(GLint) data_buffer;
 } chunk_t;
 
+typedef struct map_t map_t;
+
 chunk_t * chunk_create(i32 z, i32 x);
 void chunk_destroy(chunk_t *chunk);
 void chunk_gen_map(chunk_t *chunk);
-void chunk_gen_buffer(chunk_t *chunk);
+void chunk_gen_buffer(chunk_t *chunk, map_t *map);
 
 #endif

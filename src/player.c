@@ -39,7 +39,7 @@ void player_set_chunks(player_t *player, map_t *map) {
                 if (!plist_contains(player->chunk_list, chunk)) {
                     plist_add(&player->chunk_list, chunk);
                     chunk_gen_map(chunk);
-                    chunk_gen_buffer(chunk);
+                    chunk_gen_buffer(chunk, map);
                 }
             } else {
                 if (plist_contains(player->chunk_list, chunk)) {
