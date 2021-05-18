@@ -1,8 +1,8 @@
 #include "matrix.h"
 
-static void normalize(f32 *x);
-static inline f32 dot(f32 *x, f32 *y);
-static void cross(f32 *x, f32 *y, f32 *cross);
+static void normalize(f32 x[3]);
+static inline f32 dot(f32 x[3], f32 y[3]);
+static void cross(f32 x[3], f32 y[3], f32 cross[3]);
 static void matrix_display(matrix_t matrix);
 
 matrix_t matrix_perspective(f32 fov, f32 aspect, f32 near, f32 far) {
@@ -94,7 +94,7 @@ matrix_t matrix_translation(const f32 t[3]) {
 	return matrix;
 }
 
-static void normalize(f32 *x) {
+static void normalize(f32 x[3]) {
 	f32 n = dot(x, x);
 	if(n != 0) {
 		n=sqrt(n);
