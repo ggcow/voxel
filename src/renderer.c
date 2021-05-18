@@ -14,7 +14,7 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
 	plist_foreach(player->chunk_list, chunk, chunk_t) {
 	    glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
         glEnableVertexAttribArray(1);
-        glVertexAttribPointer(1, 4, GL_INT, GL_FALSE, 0, NULL);
+        glVertexAttribIPointer(1, 4, GL_INT, 0, NULL);
         glVertexAttribDivisor(1, 1);
         glDrawArraysInstanced(GL_TRIANGLE_FAN,
                               0,
@@ -68,7 +68,7 @@ static bool setup(renderer_t *renderer) {
               GL_STATIC_DRAW);
 
     glEnableVertexAttribArray(0);
-    glVertexAttribPointer(0, 2, GL_INT, GL_FALSE, 0, NULL);
+    glVertexAttribIPointer(0, 2, GL_INT, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
 	glClearColor(0, 0.6, 1, 0);
