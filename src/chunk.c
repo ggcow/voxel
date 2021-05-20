@@ -2,7 +2,6 @@
 #include "opengl.h"
 #include <math.h>
 
-static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk);
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk);
 static void map_set(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
 static bool there_is_cube(i32 x, i32 y, i32 z, chunk_t *chunk, map_t *map);
@@ -125,13 +124,8 @@ static bool there_is_cube(i32 x, i32 y, i32 z, chunk_t *chunk, map_t *map) {
         chunk_gen_map(target_chunk);
         return map_get(x, y, 0, target_chunk);
     }
-    log_error("no return in there_is_cube");
-}
-
-static bool map_verify(i32 x, i32 y, i32 z, chunk_t *chunk) {
-    return -MAP_HEIGHT/2 <= y && y < MAP_HEIGHT/2
-            && 0 <= z && z < CHUNK_SIZE
-            && 0 <= x && x < CHUNK_SIZE;
+    log_error("This shouldn't happen");
+    return FALSE;
 }
 
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk) {

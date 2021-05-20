@@ -45,6 +45,10 @@ enum state {
 #define NULL ((void *) 0)
 #endif
 
+#define N_THREADS 4
+
+#define __unused __attribute__((unused))
+
 void * _allocate(const char *filename, u32 line, usize size);
 void * _callocate(const char *filename, u32 line, usize size);
 void * _reallocate(const char *filename, u32 line, void *pointer, usize size);

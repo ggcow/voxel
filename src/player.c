@@ -31,11 +31,11 @@ void player_destroy(player_t *player) {
 }
 
 void player_set_chunks(player_t *player, map_t *map) {
-    // TODO save the indices around circle when updating rendering distance
-    for (int i=-(int)ceilf(player->rendering_distance)-1; i<=(int)ceilf(player->rendering_distance)+1; i++) {
-        for (int j=-(int)ceilf(player->rendering_distance)-1; j<=(int)ceilf(player->rendering_distance)+1; j++) {
-            chunk_t *chunk = map_chunk_get(i+player->chunk->z, j+player->chunk->x, map);
-            if (i*i+j*j<=(int)(player->rendering_distance*player->rendering_distance)) {
+    i32 r = (int) ceilf(player->rendering_distance)+1;
+    for (int i=-r; i<=r; i++) {
+        for (int j =-r; j <= r; j++) {
+            chunk_t *chunk = map_chunk_get(i + player->chunk->z, j + player->chunk->x, map);
+            if (i * i + j * j <= (r-1)*(r-1)) {
                 if (!plist_contains(player->chunk_list, chunk)) {
                     plist_add(&player->chunk_list, chunk);
                     chunk_gen_map(chunk);
@@ -50,7 +50,7 @@ void player_set_chunks(player_t *player, map_t *map) {
             }
         }
     }
-    // free map inside circle offset 1
+    //tasks
     renderer_bind_buffers(player);
 }
 

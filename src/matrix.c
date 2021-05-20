@@ -3,7 +3,8 @@
 static void normalize(f32 x[3]);
 static inline f32 dot(f32 x[3], f32 y[3]);
 static void cross(f32 x[3], f32 y[3], f32 cross[3]);
-static void matrix_display(matrix_t matrix);
+
+__unused static void matrix_display(matrix_t matrix);
 
 matrix_t matrix_perspective(f32 fov, f32 aspect, f32 near, f32 far) {
 	matrix_t matrix = matrix_identity;
@@ -108,14 +109,14 @@ static f32 dot(f32 x[3], f32 y[3]) {
 	return x[0]*y[0]+x[1]*y[1]+x[2]*y[2];
 }
 
-static void cross(f32 x[3], f32 y[3], f32 *cross)
+static void cross(f32 x[3], f32 y[3], f32 cross[3])
 {  
     cross[0] = x[1] * y[2] - x[2] * y[1]; 
     cross[1] = x[2] * y[0] - x[0] * y[2]; 
     cross[2] = x[0] * y[1] - x[1] * y[0];
 }
 
-void matrix_display(matrix_t matrix) {
+__unused void matrix_display(matrix_t matrix) {
 	fprintf(stderr, "\n\n╭───────────────────────────────────────────────╮");
 	for(int i=0; i<4; i++) {
 		fprintf(stderr, "\n│");
