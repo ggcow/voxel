@@ -23,7 +23,6 @@ typedef struct render_t {
 renderer_t * renderer_create();
 void renderer_destroy(renderer_t *renderer);
 
-void renderer_bind_buffers(player_t *player);
 void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp);
 
 #endif

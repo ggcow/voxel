@@ -28,6 +28,8 @@ void player_destroy(player_t *player);
 void player_set_chunks(player_t *player, map_t *map);
 void player_set_look(player_t *player, i32 dx, i32 dy);
 
+void player_reload_chunks(player_t *player);
+
 
 
 #endif

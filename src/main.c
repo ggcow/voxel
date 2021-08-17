@@ -50,7 +50,7 @@ int main(int argc, char *argv[]) {
 		goto exit;
 	}
 	player_set_chunks(player, map);
-    renderer_bind_buffers(player);
+    player_reload_chunks(player);
 
     control_key_set_defaults();
 

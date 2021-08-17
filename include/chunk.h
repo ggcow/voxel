@@ -30,5 +30,6 @@ void chunk_free_map(chunk_t *chunk);
 void chunk_free_buffer(chunk_t *chunk);
 void chunk_gen_map(chunk_t *chunk);
 void chunk_gen_buffer(chunk_t *chunk, map_t *map);
+void chunk_reload(chunk_t *chunk);
 
 #endif

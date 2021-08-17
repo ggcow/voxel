@@ -104,15 +104,4 @@ void renderer_destroy(renderer_t *renderer) {
 	log_debug("Renderer destroyed");
 }
 
-void renderer_bind_buffers(player_t *player) {
-    plist_foreach(player->chunk_list, chunk, chunk_t) {
-        glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
-        glBufferData(GL_ARRAY_BUFFER,
-                     sizeof(GL_INT) * (chunk->data_buffer.index),
-                     chunk->data_buffer.data,
-                     GL_STATIC_DRAW);
-        glBindBuffer(GL_ARRAY_BUFFER, 0);
-    }
-}
-
 

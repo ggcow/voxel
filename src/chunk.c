@@ -95,6 +95,15 @@ void chunk_gen_buffer(chunk_t *chunk, map_t *map) {
     }
 }
 
+void chunk_reload(chunk_t *chunk) {
+    glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
+    glBufferData(GL_ARRAY_BUFFER,
+                 sizeof(GL_INT) * (chunk->data_buffer.index),
+                 chunk->data_buffer.data,
+                 GL_STATIC_DRAW);
+    glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
 chunk_t * map_chunk_get(i32 z, i32 x, map_t *);
 
 static bool there_is_cube(i32 x, i32 y, i32 z, chunk_t *chunk, map_t *map) {
