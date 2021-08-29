@@ -14,7 +14,7 @@ player_t * player_create(map_t *map) {
 	player->inclination=0.0f;
 	player->azimuth=0.0f;
 
-	player->speed=20.0f;
+	player->speed=5.0f;
 
 	player->rendering_distance = 2;
 
@@ -32,14 +32,19 @@ void player_destroy(player_t *player) {
 
 void player_set_chunks(player_t *player, map_t *map) {
     i32 r = (int) ceilf(player->rendering_distance)+1;
-    for (int i=-r; i<=r; i++) {
-        for (int j =-r; j <= r; j++) {
+
+    for (int i=-3*r; i<=3*r; i++) {
+        for (int j =-3*r; j <= 3*r; j++) {
             chunk_t *chunk = map_chunk_get(i + player->chunk->z, j + player->chunk->x, map);
+            if (i * i + j * j > 9*r*r-1) {
+                chunk_unload(chunk);
+            }
             if (i * i + j * j <= (r-1)*(r-1)) {
                 if (!plist_contains(player->chunk_list, chunk)) {
                     plist_add(&player->chunk_list, chunk);
                     chunk_gen_map(chunk);
                     chunk_gen_buffer(chunk, map);
+                    chunk_load(chunk);
                 }
             } else {
                 if (plist_contains(player->chunk_list, chunk)) {
@@ -50,8 +55,6 @@ void player_set_chunks(player_t *player, map_t *map) {
             }
         }
     }
-    //tasks
-    player_reload_chunks(player);
 }
 
 void player_set_look(player_t *player, i32 dx, i32 dy) {
@@ -80,10 +83,4 @@ void player_set_look(player_t *player, i32 dx, i32 dy) {
 	player->look[2]=cos(*inclination)*cos(*azimuth);
 	player->look[0]=cos(*inclination)*sin(*azimuth);
 	player->look[1]=sin(*inclination);
-}
-
-void player_reload_chunks(player_t *player) {
-    plist_foreach(player->chunk_list, chunk, chunk_t) {
-        chunk_reload(chunk);
-    }
 }

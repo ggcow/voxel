@@ -1,11 +1,12 @@
 #include <stdio.h>
 
 #include "renderer.h"
+#include "texture.h"
 
 static bool setup(renderer_t *renderer);
 
-void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
-
+void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp)
+{
 	GLuint MatrixID = glGetUniformLocation(renderer->shader_program.program, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, (GLfloat *) mvp);
 
@@ -23,7 +24,8 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp) {
 	}
 }
 
-static bool setup(renderer_t *renderer) {
+static bool setup(renderer_t *renderer)
+{
     char vertex_shader_path[200];
     char fragment_shader_path[200];
     strcpy(vertex_shader_path, ROOT_FOLDER);
@@ -63,7 +65,7 @@ static bool setup(renderer_t *renderer) {
 
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
 	glBufferData(GL_ARRAY_BUFFER,
-              sizeof(GL_INT) * (renderer->vertex_buffer.index),
+              sizeof (GLint) * (renderer->vertex_buffer.index),
               renderer->vertex_buffer.data,
               GL_STATIC_DRAW);
 
@@ -75,14 +77,19 @@ static bool setup(renderer_t *renderer) {
 
 	glUseProgram(renderer->shader_program.program);
 
-	glEnable(GL_DEPTH_TEST);
+	texture_setup();
+    GLint texture_count_location = glGetUniformLocation(renderer->shader_program.program, "texture_count");
+    glUniform1ui(texture_count_location, TEXTURE_COUNT);
+
+	glEnable(GL_DEPTH_TEST | GL_TEXTURE_2D);
 	glDepthFunc(GL_LESS);
 
 	return TRUE;
 }
 
 
-renderer_t * renderer_create(void) {
+renderer_t * renderer_create(void)
+{
 	renderer_t *renderer = callocate(sizeof(renderer_t));
 
 	if (!setup(renderer)) {
@@ -93,7 +100,8 @@ renderer_t * renderer_create(void) {
 	return renderer;
 }
 
-void renderer_destroy(renderer_t *renderer) {
+void renderer_destroy(renderer_t *renderer)
+{
     glUseProgram(0);
     glBindVertexArray(0);
     glDisableVertexArrayAttrib(renderer->vao, 0);

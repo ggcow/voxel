@@ -20,6 +20,8 @@ typedef struct chunk_t {
 
     GLuint vbo;
     buffer_type(GLint) data_buffer;
+
+    bool loaded;
 } chunk_t;
 
 typedef struct map_t map_t;
@@ -30,6 +32,7 @@ void chunk_free_map(chunk_t *chunk);
 void chunk_free_buffer(chunk_t *chunk);
 void chunk_gen_map(chunk_t *chunk);
 void chunk_gen_buffer(chunk_t *chunk, map_t *map);
-void chunk_reload(chunk_t *chunk);
+void chunk_load(chunk_t *chunk);
+void chunk_unload(chunk_t *chunk);
 
 #endif

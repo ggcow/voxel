@@ -28,10 +28,6 @@ window_t * window_create(u32 width, u32 height);
 void window_destroy(window_t *window);
 
 void window_swap(window_t *window);
-void window_skip_frame(window_t *window);
-
-u32 window_get_width(const window_t *window);
-u32 window_get_height(const window_t *window);
 
 u64 window_get_time_ms(const window_t *window);
 f64 window_get_time_s(const window_t *window);

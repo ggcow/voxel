@@ -1,5 +1,6 @@
 #include "chunk.h"
 #include "opengl.h"
+#include "texture.h"
 #include <math.h>
 
 static u32 map_get(i32 x, i32 y, i32 z, chunk_t *chunk);
@@ -83,7 +84,7 @@ void chunk_gen_buffer(chunk_t *chunk, map_t *map) {
                 buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE);
                 buffer_push(chunk->data_buffer, y + (i+1)/2);
                 buffer_push(chunk->data_buffer, z + chunk->z * CHUNK_SIZE +(i+1)/2);
-                buffer_push(chunk->data_buffer, i<0?1:4);
+                buffer_push(chunk->data_buffer, i<0?1:4|TEXTURE_TOP<<3);
             }
             if (!there_is_cube(x, y, z+i, chunk, map)) {
                 buffer_push(chunk->data_buffer, x + chunk->x * CHUNK_SIZE -(i-1)/2);
@@ -95,13 +96,20 @@ void chunk_gen_buffer(chunk_t *chunk, map_t *map) {
     }
 }
 
-void chunk_reload(chunk_t *chunk) {
+void chunk_load(chunk_t *chunk) {
+    if (chunk->loaded) return;
+    chunk->loaded = TRUE;
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
     glBufferData(GL_ARRAY_BUFFER,
                  sizeof(GL_INT) * (chunk->data_buffer.index),
                  chunk->data_buffer.data,
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+void chunk_unload(chunk_t *chunk) {
+    chunk->loaded = FALSE;
+    glInvalidateBufferData(chunk->vbo);
 }
 
 chunk_t * map_chunk_get(i32 z, i32 x, map_t *);

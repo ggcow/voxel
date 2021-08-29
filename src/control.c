@@ -17,7 +17,7 @@ void control_key_set_defaults(void) {
 }
 
 enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
-    for (register int i=0; i<NUMBER_OF_CONTROL_KEYS; i++) {
+    for (int i=0; i<NUMBER_OF_CONTROL_KEYS; i++) {
         if (control_key_map[i] == key_code) {
             return (enum control_key_t) 1 << i;
         }
@@ -37,10 +37,10 @@ enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
  */
 bool control_move(player_t *player, map_t *map, u32 keys, f32 delta) {
     static u32 last_keys = 0;
-    static chunk_t  *last_chunk = NULL;
+    static chunk_t *last_chunk = NULL;
 
     bool refresh_chunks = FALSE;
-    if (!(keys & KEY_RENDERING_DISTANCE_PLUS) != !(keys & KEY_RENDERING_DISTANCE_MINUS)) {
+    if ((keys & KEY_RENDERING_DISTANCE_PLUS) ^ (keys & KEY_RENDERING_DISTANCE_MINUS)) {
         if (keys & KEY_RENDERING_DISTANCE_PLUS) {
             player->rendering_distance += 0.1f;
             if (player->rendering_distance > 100) {
@@ -52,7 +52,6 @@ bool control_move(player_t *player, map_t *map, u32 keys, f32 delta) {
                 player->rendering_distance = 0;
             }
         }
-        log_info("rendering distance : %f", player->rendering_distance);
         refresh_chunks = TRUE;
     }
 

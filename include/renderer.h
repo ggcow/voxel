@@ -14,7 +14,6 @@ typedef struct render_t {
     shader_program_t shader_program;
 	GLuint vao;
 	GLuint vbo;
-
 	buffer_type(GLint) vertex_buffer;
 } renderer_t;
 
