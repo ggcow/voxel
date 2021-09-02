@@ -10,6 +10,9 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp)
 	GLuint MatrixID = glGetUniformLocation(renderer->shader_program.program, "MVP");
 	glUniformMatrix4fv(MatrixID, 1, GL_FALSE, (GLfloat *) mvp);
 
+    GLuint eyeID = glGetUniformLocation(renderer->shader_program.program, "eye");
+    glUniform3fv(eyeID, 1, player->eye);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	plist_foreach(player->chunk_list, chunk, chunk_t) {
@@ -81,8 +84,12 @@ static bool setup(renderer_t *renderer)
     GLint texture_count_location = glGetUniformLocation(renderer->shader_program.program, "texture_count");
     glUniform1ui(texture_count_location, TEXTURE_COUNT);
 
-	glEnable(GL_DEPTH_TEST | GL_TEXTURE_2D);
+	glEnable(GL_DEPTH_TEST);
+	glEnable(GL_TEXTURE_2D);
 	glDepthFunc(GL_LESS);
+    glFrontFace(GL_CW);
+    glCullFace(GL_BACK);
+    glEnable(GL_CULL_FACE);
 
 	return TRUE;
 }

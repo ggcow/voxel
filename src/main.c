@@ -38,7 +38,7 @@ int main(int argc, char *argv[]) {
 		goto exit;
 	}
 
-	event_data = event_data_create(player);
+	event_data = event_data_create(player, map);
 	if (!event_data) {
 		log_error("Event data could not be created");
 		goto exit;
@@ -54,11 +54,10 @@ int main(int argc, char *argv[]) {
 
 	window_set_key_callback(window, key_callback, event_data);
 	window_set_mouse_move_callback(window, mouse_move_callback, event_data);
+	window_set_mouse_button_callback(window, mouse_button_callback, event_data);
 
 	event_data->close_requested = &(window->close_requested);
-    glFrontFace(GL_CW);
-    glCullFace(GL_BACK);
-    glEnable(GL_CULL_FACE);
+
     matrix_t view, perspective, mvp;
 	while (!window->close_requested) {
         event_poll_events(window, &perspective);

@@ -34,5 +34,7 @@ void chunk_gen_map(chunk_t *chunk);
 void chunk_gen_buffer(chunk_t *chunk, map_t *map);
 void chunk_load(chunk_t *chunk);
 void chunk_unload(chunk_t *chunk);
+u32 chunk_get_cube(i32 x, i32 y, i32 z, chunk_t *chunk);
+void chunk_set_cube(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
 
 #endif

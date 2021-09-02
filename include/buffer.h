@@ -25,7 +25,7 @@ while (buffer.index + added_size >= buffer.size) {                              
     buffer.data = reallocate(buffer.data, sizeof(*buffer.data) * buffer.size);                  \
 }
 
-#define buffer_push(buffer, value) buffer.data[buffer.index++] = value
+#define buffer_push(buffer, value) buffer.data[buffer.index++] = value;
 #define buffer_terminate(buffer)                                                                \
 if (buffer.data) deallocate(buffer.data);                                                       \
 buffer.data = NULL;
@@ -39,5 +39,10 @@ typedef struct pbuffer_t {
 
 pbuffer_t pbuffer_make(void (*data_destroy)(void *));
 void pbuffer_terminate(pbuffer_t);
+int iu_buffer_loop_check(int b);
+
+#define buffer_foreach(loop_buffer, loop_var) \
+for (u32 _i = 0; _i < loop_buffer.index; _i++) \
+for (typeof(*loop_buffer.data) loop_var = loop_buffer.data[_i]; _buffer_loop_check(1); _buffer_loop_check(0))
 
 #endif

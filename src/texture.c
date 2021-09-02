@@ -17,6 +17,7 @@ void texture_setup(void)
     GLubyte *data = allocate(sizeof (GLubyte) * TEXTURE_SIZE * TEXTURE_SIZE * 3 * TEXTURE_COUNT);
     texture_load(data, "../assets/dirt.png");
     texture_load(data, "../assets/top.png");
+    texture_load(data, "../assets/side.png");
 
     glTexImage2D(GL_TEXTURE_2D,
                  0, GL_RGB,
@@ -24,6 +25,7 @@ void texture_setup(void)
                  0, GL_RGB, GL_UNSIGNED_BYTE, data);
     
     glGenerateMipmap(GL_TEXTURE_2D);
+    deallocate(data);
 }
 
 static void texture_load(GLubyte *array, const char *path)

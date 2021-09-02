@@ -84,12 +84,12 @@ shader_program_t shader_program_make(const GLchar *vertex_shader_source,
         goto error;
     }
 
-    shader_program_t shader_program = {
+    return (shader_program_t) {
             program,
             vertex_shader,
             fragment_shader
     };
-    return shader_program;
+
 
     error:
     if (fragment_shader) glDeleteShader(fragment_shader);

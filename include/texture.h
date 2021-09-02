@@ -8,6 +8,7 @@
 enum texture_t {
     TEXTURE_DIRT,
     TEXTURE_TOP,
+    TEXTURE_SIDE,
     TEXTURE_COUNT
 };
 

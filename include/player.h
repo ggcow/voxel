@@ -14,6 +14,8 @@ typedef struct player_t {
 	f32 azimuth;
 
 	f32 speed;
+	f32 velocity[3];
+	f32 gravity;
 
 	chunk_t *chunk;
 
@@ -28,6 +30,7 @@ void player_destroy(player_t *player);
 void player_set_chunks(player_t *player, map_t *map);
 void player_set_look(player_t *player, i32 dx, i32 dy);
 
-
+void player_hit_cube(player_t *player, map_t *map);
+void player_put_cube(player_t *player, map_t *map);
 
 #endif

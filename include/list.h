@@ -17,8 +17,8 @@ bool plist_contains(plist_t list, void *pointer);
 void plist_remove(plist_t *list, void *pointer);
 void plist_add(plist_t *list, void *pointer);
 
-#define plist_foreach(l,p,t) \
-for (plist_t _l = l; _l; _l = _l->next) \
-for (t *p = (t *) _l->value; p; p = NULL)
+#define plist_foreach(loop_list, loop_pointer, loop_list_type) \
+for (plist_t _l = loop_list; _l; _l = _l->next) \
+for (loop_list_type *loop_pointer = (loop_list_type *) _l->value; loop_pointer; loop_pointer = NULL)
 
 #endif

@@ -1,12 +1,11 @@
 #include <math.h>
 #include "player.h"
-#include "renderer.h"
 
 player_t * player_create(map_t *map) {
 	player_t *player = callocate(sizeof(player_t));
 
 	player->eye[0]=CHUNK_SIZE/2;
-	player->eye[1]=20.0f;
+	player->eye[1]=50.0f;
 	player->eye[2]=CHUNK_SIZE/2;
 
 	player->chunk = map->chunk00;
@@ -14,7 +13,7 @@ player_t * player_create(map_t *map) {
 	player->inclination=0.0f;
 	player->azimuth=0.0f;
 
-	player->speed=5.0f;
+	player->speed=50.0f;
 
 	player->rendering_distance = 2;
 
@@ -35,7 +34,7 @@ void player_set_chunks(player_t *player, map_t *map) {
 
     for (int i=-3*r; i<=3*r; i++) {
         for (int j =-3*r; j <= 3*r; j++) {
-            chunk_t *chunk = map_chunk_get(i + player->chunk->z, j + player->chunk->x, map);
+            chunk_t *chunk = map_get_chunk(i + player->chunk->z, j + player->chunk->x, map);
             if (i * i + j * j > 9*r*r-1) {
                 chunk_unload(chunk);
             }
@@ -83,4 +82,28 @@ void player_set_look(player_t *player, i32 dx, i32 dy) {
 	player->look[2]=cos(*inclination)*cos(*azimuth);
 	player->look[0]=cos(*inclination)*sin(*azimuth);
 	player->look[1]=sin(*inclination);
+}
+
+static cube_t * get_target(player_t *player, map_t *map) {
+    f32 position[] = {player->eye[0], player->eye[1], player->eye[2]};
+    for (int i=0; i<10; i++) {
+        for (int j=0; j<3; j++) {
+            position[j] += player->look[j];
+        }
+        if (!map_get_cube(position[0], position[1], position[2], map)) {
+            return map_get_cube(position[0], position[1], position[2], map);
+        }
+    }
+    return NULL;
+}
+
+void player_hit_cube(player_t *player, map_t *map) {
+    cube_t *target = get_target(player, map);
+    if (target) {
+        map_remove_cube(map, *target);
+    }
+}
+
+void player_put_cube(player_t *player, map_t *map) {
+
 }

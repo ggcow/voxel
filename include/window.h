@@ -17,11 +17,13 @@ typedef struct window_t {
 	void (*key_callback)(void *, SDL_KeyCode , enum state, u32);
 	void *key_callback_data;
 
+    void (*mouse_button_callback)(void *, i32, i32, u8, u32);
+    void *mouse_button_callback_data;
+
 	f64 time_s;
 	u64 time_delta;
 	u64 time_ms;
 	u64 time_us;
-	u32 sdl_time;
 } window_t;
 
 window_t * window_create(u32 width, u32 height);
@@ -44,6 +46,12 @@ void window_set_key_callback(
 	window_t *window,
 	void (*callback)(void *, SDL_KeyCode, enum state, u32),
 	void *data
+);
+
+void window_set_mouse_button_callback(
+        window_t *window,
+        void (*callback)(void *, i32, i32, u8, u32),
+        void *data
 );
 
 #endif
