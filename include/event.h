@@ -12,7 +12,7 @@ typedef struct event_data_t {
 	u32 keys;
 
 	player_t *player;
-	map_t *map
+	map_t *map;
 } event_data_t;
 
 void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time);

@@ -2,15 +2,14 @@
 
 void plist_destroy(plist_t *list) {
     //TODO FIX MEMORY LEAK
-    plist_t next = *list;
-    for (; next; *list = next) {
+    for (plist_t next = *list; next; *list = next) {
         next = (*list)->next;
         deallocate(*list);
     }
     *list = NULL;
 }
 
-bool plist_contains(plist_t list, void *pointer) {
+int plist_contains(plist_t list, void *pointer) {
     plist_foreach(list, p, void) {
         if (p == pointer) {
             return TRUE;
@@ -49,4 +48,12 @@ void plist_add(plist_t *list, void *pointer) {
     } else {
         *list = new;
     }
+}
+
+int iu_list_loop_check(int b)
+{
+    static int s_b = 1;
+    int r_v = s_b;
+    s_b = b;
+    return r_v;
 }

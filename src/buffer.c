@@ -17,7 +17,7 @@ void pbuffer_terminate(pbuffer_t buffer)
     deallocate(buffer.data);
 }
 
-int _buffer_loop_check(int b)
+int iu_buffer_loop_check(int b)
 {
     static int s_b = 1;
     int r_v = s_b;

@@ -5,6 +5,7 @@
 #include "renderer.h"
 #include "player.h"
 #include "matrix.h"
+#include "cube.h"
 
 
 #define WIDTH 955
