@@ -1,12 +1,12 @@
 #include <math.h>
 #include "player.h"
 
+#define PLAYER_RADIUS 0.4
+
 player_t * player_create(map_t *map) {
 	player_t *player = callocate(sizeof(player_t));
 
-	player->eye[0]=CHUNK_SIZE/2;
 	player->eye[1]=50.0f;
-	player->eye[2]=CHUNK_SIZE/2;
 
 	player->chunk = map->chunk00;
 
@@ -37,6 +37,8 @@ void player_set_chunks(player_t *player, map_t *map) {
             chunk_t *chunk = map_get_chunk(i + player->chunk->z, j + player->chunk->x, map);
             if (i * i + j * j > 9*r*r-1) {
                 chunk_unload(chunk);
+                chunk_free_map(chunk);
+                chunk_free_buffer(chunk);
             }
             if (i * i + j * j <= (r-1)*(r-1)) {
                 if (!plist_contains(player->chunk_list, chunk)) {
@@ -49,8 +51,7 @@ void player_set_chunks(player_t *player, map_t *map) {
                 if (plist_contains(player->chunk_list, chunk)) {
                     plist_remove(&player->chunk_list, chunk);
                 }
-                chunk_free_map(chunk);
-                chunk_free_buffer(chunk);
+
             }
         }
     }
@@ -84,26 +85,104 @@ void player_set_look(player_t *player, i32 dx, i32 dy) {
 	player->look[1]=sin(*inclination);
 }
 
-static cube_t * get_target(player_t *player, map_t *map) {
+static cube_t get_hit_target(player_t *player, map_t *map) {
     f32 position[] = {player->eye[0], player->eye[1], player->eye[2]};
-    for (int i=0; i<10; i++) {
+    int precision = 10;
+    for (int i=0; i<2 * precision; i++) {
         for (int j=0; j<3; j++) {
-            position[j] += player->look[j];
+            position[j] += player->look[j] / (float) precision;
         }
-        if (!map_get_cube(position[0], position[1], position[2], map)) {
-            return map_get_cube(position[0], position[1], position[2], map);
+        i32 x = (int)floor(position[0]);
+        i32 y = (int)floor(position[1]);
+        i32 z = (int)floor(position[2]);
+        enum block type = map_get_cube(x, y, z, map);
+        if (type) {
+            return (cube_t) {x, y, z, type};
         }
     }
-    return NULL;
+    return (cube_t) {};
+}
+
+static cube_t get_put_target(player_t *player, map_t *map) {
+    f32 position[] = {player->eye[0], player->eye[1], player->eye[2]};
+    int precision = 10;
+    for (int i=0; i<2 * precision; i++) {
+        for (int j=0; j<3; j++) {
+            position[j] += player->look[j] / (float) precision;
+        }
+        i32 x = (int)floor(position[0]);
+        i32 y = (int)floor(position[1]);
+        i32 z = (int)floor(position[2]);
+        enum block type = map_get_cube(x, y, z, map);
+        if (type) {
+            f32 v[] = {player->eye[0]-x-.5, player->eye[1]-y-.5, player->eye[2]-z-.5};
+            if (v[0] > v[1] && v[0] > -v[1] && v[0] > v[2] && v[0] > -v[2]) {
+                x++;
+            } else if (v[0] < v[1] && v[0] < -v[1] && v[0] < v[2] && v[0] < -v[2]) {
+                x--;
+            } else if (v[1] < v[2] && v[1] < -v[2] && v[1] < v[0] && v[1] < -v[0]) {
+                y--;
+            } else if (v[1] > v[2] && v[1] > -v[2] && v[1] > v[0] && v[1] > -v[0]) {
+                y++;
+            } else if (v[2] < v[0] && v[2] < -v[0] && v[2] < v[1] && v[2] < -v[1]) {
+                z--;
+            } else if (v[2] > v[0] && v[2] > -v[0] && v[2] > v[1] && v[2] > -v[1]) {
+                z++;
+            }
+            cube_t cube = {x, y, z, !map_get_cube(x, y, z, map)};
+            if (player_collide_cube(player->eye, cube)) {
+                cube.type = BLOCK_NONE;
+            }
+            return cube;
+        }
+    }
+    return (cube_t) {};
 }
 
 void player_hit_cube(player_t *player, map_t *map) {
-    cube_t *target = get_target(player, map);
-    if (target) {
-        map_remove_cube(map, *target);
+    cube_t cube = get_hit_target(player, map);
+    if (cube.type) {
+        map_remove_cube(cube.x, cube.y, cube.z, map);
     }
 }
 
 void player_put_cube(player_t *player, map_t *map) {
+    cube_t cube = get_put_target(player, map);
+    if (cube.type) map_add_cube(cube, map);
+}
 
+bool player_collide(f32 eye[3], map_t *map)
+{
+    f32 r = PLAYER_RADIUS;
+    i32 y = floor(eye[1]-2.5*r);
+
+    i32 x[2], z[2];
+
+
+    for (int i=0; i<2; i++) {
+        x[i] = floorf(eye[0] + (i?r:-r));
+        z[i] = floorf(eye[2] + (i?r:-r));
+    }
+
+    for (int i=0; i<4; i++) {
+        if (map_get_cube(x[i>>1], y, z[i&1], map)) return 1;
+    }
+    return 0;
+}
+
+bool player_collide_cube(f32 eye[3], cube_t cube)
+{
+    f32 r = PLAYER_RADIUS;
+    i32 y = floor(eye[1]-2.5*r);
+    i32 x[2], z[2];
+
+    for (int i=0; i<2; i++) {
+        x[i] = floorf(eye[0] + (i?r:-r));
+        z[i] = floorf(eye[2] + (i?r:-r));
+    }
+
+    for (int i=0; i<4; i++) {
+        if (cube.x == x[i>>1] && cube.y == y && cube.z == z[i&1]) return TRUE;
+    }
+    return FALSE;
 }

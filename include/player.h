@@ -24,13 +24,16 @@ typedef struct player_t {
 } player_t;
 
 
-player_t * player_create(map_t *map);
-void player_destroy(player_t *player);
+player_t * player_create(map_t *);
+void player_destroy(player_t *);
 
-void player_set_chunks(player_t *player, map_t *map);
-void player_set_look(player_t *player, i32 dx, i32 dy);
+void player_set_chunks(player_t *, map_t *);
+void player_set_look(player_t *, i32 dx, i32 dy);
 
-void player_hit_cube(player_t *player, map_t *map);
-void player_put_cube(player_t *player, map_t *map);
+void player_hit_cube(player_t *, map_t *);
+void player_put_cube(player_t *, map_t *);
+
+bool player_collide(f32 eye[3], map_t *);
+bool player_collide_cube(f32 eye[3], cube_t);
 
 #endif

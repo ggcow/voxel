@@ -41,8 +41,5 @@ pbuffer_t pbuffer_make(void (*data_destroy)(void *));
 void pbuffer_terminate(pbuffer_t);
 int iu_buffer_loop_check(int b);
 
-#define buffer_foreach(loop_buffer, loop_var) \
-for (u32 _i = 0; _i < loop_buffer.index; _i++) \
-for (typeof(*loop_buffer.data) loop_var = loop_buffer.data[_i]; _buffer_loop_check(1); _buffer_loop_check(0))
 
 #endif

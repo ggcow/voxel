@@ -5,20 +5,18 @@
 
 #include <SDL2/SDL.h>
 
+typedef struct event_data_t event_data_t;
+
 typedef struct window_t {
 	SDL_Window *sdl_window;
 	SDL_GLContext *gl_context;
 	u32 width, height;
 	bool close_requested;
 
-	void (*mouse_move_callback)(void *, i32, i32, u32);
-	void *mouse_move_callback_data;
-
-	void (*key_callback)(void *, SDL_KeyCode , enum state, u32);
-	void *key_callback_data;
-
-    void (*mouse_button_callback)(void *, i32, i32, u8, u32);
-    void *mouse_button_callback_data;
+    void (*mouse_button_callback)(struct window_t *, i32, i32, u8);
+	void (*mouse_move_callback)(struct window_t *, i32, i32);
+	void (*key_callback)(struct window_t *, SDL_KeyCode , enum state);
+    event_data_t *callback_data;
 
 	f64 time_s;
 	u64 time_delta;
@@ -38,20 +36,17 @@ f64 window_get_time_delta(const window_t *window);
 
 void window_set_mouse_move_callback(
 	window_t *window,
-	void (*callback)(void *, i32, i32, u32),
-	void *data
+	void (*callback)(window_t *, i32, i32)
 );
 
 void window_set_key_callback(
 	window_t *window,
-	void (*callback)(void *, SDL_KeyCode, enum state, u32),
-	void *data
+	void (*callback)(window_t  *, SDL_KeyCode, enum state)
 );
 
 void window_set_mouse_button_callback(
         window_t *window,
-        void (*callback)(void *, i32, i32, u8, u32),
-        void *data
+        void (*callback)(window_t *, i32, i32, u8)
 );
 
 #endif

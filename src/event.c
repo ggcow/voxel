@@ -1,13 +1,13 @@
 #include "event.h"
 #include "opengl.h"
 
-void mouse_move_callback(void *data, i32 dx, i32 dy, u32 time) {
-	event_data_t *event_data = (event_data_t*)data;
+void mouse_move_callback(window_t *window, i32 dx, i32 dy) {
+	event_data_t *event_data = window->callback_data;
 	player_set_look(event_data->player, dx, dy);
 }
 
-void mouse_button_callback(void *data, i32 dx, i32 dy, u8 button, u32 time) {
-    event_data_t *event_data = (event_data_t *) data;
+void mouse_button_callback(window_t *window, i32 dx, i32 dy, u8 button) {
+    event_data_t *event_data = window->callback_data;
     switch (button) {
         case SDL_BUTTON_LEFT:
             player_hit_cube(event_data->player, event_data->map);
@@ -17,13 +17,33 @@ void mouse_button_callback(void *data, i32 dx, i32 dy, u8 button, u32 time) {
             break;
         default:break;
     }
-    player_set_look(event_data->player, dx, dy);
+}
+
+void key_callback(window_t*window, SDL_KeyCode key_code, enum state key_state) {
+    event_data_t *event_data = window->callback_data;
+    enum control_key_t key = control_key_from_sdl_keycode(key_code);
+    if (key != KEY_UNKNOWN) {
+        if(key_state == DOWN) {
+            event_data->keys |= key;
+        } else {
+            event_data->keys &= ~key;
+        }
+        return;
+    }
+
+    switch (key_code) {
+        case SDLK_ESCAPE:
+        case SDLK_RETURN:
+            *(event_data->close_requested) = TRUE;
+            break;
+        default:;
+    }
 }
 
 event_data_t * event_data_create(player_t *player, map_t *map) {
 	event_data_t *event_data = callocate(sizeof(event_data_t));
-	event_data->keys=0;
-	event_data->player=player;
+	event_data->keys = 0;
+	event_data->player = player;
 	event_data->map = map;
 	log_debug("Event data created");
 	return event_data;
@@ -33,28 +53,6 @@ event_data_t * event_data_create(player_t *player, map_t *map) {
 void event_data_destroy(event_data_t *event_data) {
 	deallocate(event_data);
 	log_debug("Event data destroyed");
-}
-
-void key_callback(void *data, SDL_KeyCode key_code, enum state key_state, u32 time) {
-	event_data_t *event_data = (event_data_t*)data;
-
-	enum control_key_t key = control_key_from_sdl_keycode(key_code);
-	if (key != KEY_UNKNOWN) {
-        if(key_state == DOWN) {
-            event_data->keys |= key;
-        } else {
-            event_data->keys &= ~key;
-        }
-        return;
-	}
-
-	switch (key_code) {
-	    case SDLK_ESCAPE:
-        case SDLK_RETURN:
-            *(event_data->close_requested) = TRUE;
-            break;
-	    default:;
-    }
 }
 
 
@@ -75,30 +73,29 @@ void event_poll_events(window_t *window, matrix_t *perspective) {
                                               0.0001f,
                                               1000.0f);
         } else if (event.type == SDL_KEYDOWN && window->key_callback) {
-                window->key_callback(window->key_callback_data,
-                                     event.key.keysym.sym,
-                                     DOWN,
-                                     window->time_ms);
+            window->key_callback(
+                    window,
+                    event.key.keysym.sym,
+                    DOWN
+            );
         } else if (event.type == SDL_KEYUP && window->key_callback) {
-            window->key_callback(window->key_callback_data,
-                                 event.key.keysym.sym,
-                                 UP,
-                                 window->time_ms);
-        } else if (event.type == SDL_MOUSEBUTTONDOWN) {
-
+            window->key_callback(
+                    window,
+                    event.key.keysym.sym,
+                    UP
+            );
         } else if (event.type == SDL_MOUSEMOTION && window->mouse_move_callback) {
             window->mouse_move_callback(
-                window->mouse_move_callback_data,
+                window,
                 event.motion.xrel,
-                event.motion.yrel,
-                window->time_ms
+                event.motion.yrel
             );
         } else if (event.type == SDL_MOUSEBUTTONDOWN && window->mouse_button_callback) {
-            window->mouse_button_callback(window->mouse_button_callback,
+            window->mouse_button_callback(
+                window,
                 event.button.x,
                 event.button.y,
-                event.button.button,
-                window->time_ms
+                event.button.button
             );
         }
 	}

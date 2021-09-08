@@ -27,6 +27,5 @@ void main(){
 	uv = (vertex_position+1/2);
     texture_index = vertex_data.w >> 3;
     normal = (vec3(1, 1, 1) - abs(M[index] * vec2(1, 1))) * sign(index*2-5);
-//    normal = vec3(0, 1, 0);
     light_source = eye;
 }

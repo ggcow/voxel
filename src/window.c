@@ -124,20 +124,18 @@ f64 window_get_time_s(const window_t *window)
 }
 
 
-void window_set_mouse_move_callback(window_t *window, void (*callback)(void *, i32, i32, u32), void *data)
+void window_set_mouse_move_callback(window_t *window, void (*callback)(window_t *, i32, i32))
 {
 	window->mouse_move_callback = callback;
-	window->mouse_move_callback_data = data;
 }
 
 
-void window_set_key_callback(window_t *window, void (*callback)(void *, SDL_KeyCode , enum state, u32), void *data)
+void window_set_key_callback(window_t *window, void (*callback)(window_t *, SDL_KeyCode , enum state))
 {
 	window->key_callback = callback;
-	window->key_callback_data = data;
 }
 
-void window_set_mouse_button_callback(window_t *window, void (*callback)(void *, i32, i32, u8, u32), void *data) {
+void window_set_mouse_button_callback(window_t *window, void (*callback)(window_t *, i32, i32, u8))
+{
     window->mouse_button_callback = callback;
-    window->mouse_button_callback_data = data;
 }

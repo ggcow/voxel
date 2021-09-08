@@ -16,7 +16,7 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp)
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
 	plist_foreach(player->chunk_list, chunk, chunk_t) {
-	    glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
+        glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
         glEnableVertexAttribArray(1);
         glVertexAttribIPointer(1, 4, GL_INT, 0, NULL);
         glVertexAttribDivisor(1, 1);
@@ -33,8 +33,8 @@ static bool setup(renderer_t *renderer)
     char fragment_shader_path[200];
     strcpy(vertex_shader_path, ROOT_FOLDER);
     strcpy(fragment_shader_path, ROOT_FOLDER);
-    strcat(vertex_shader_path, "/shaders/vertex.vs");
-    strcat(fragment_shader_path, "/shaders/fragment.fs");
+    strcat(vertex_shader_path, "/shaders/cube.vs");
+    strcat(fragment_shader_path, "/shaders/cube.fs");
     char *vertex_shader_code = shader_load_from_file(vertex_shader_path);
     char *fragment_shader_code = shader_load_from_file(fragment_shader_path);
 
@@ -66,6 +66,8 @@ static bool setup(renderer_t *renderer)
 
 	glBindVertexArray(renderer->vao);
 
+
+
 	glBindBuffer(GL_ARRAY_BUFFER, renderer->vbo);
 	glBufferData(GL_ARRAY_BUFFER,
               sizeof (GLint) * (renderer->vertex_buffer.index),
@@ -76,7 +78,7 @@ static bool setup(renderer_t *renderer)
     glVertexAttribIPointer(0, 2, GL_INT, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glClearColor(0, 0.6, 1, 0);
+	glClearColor(0, 0, 0, 0);
 
 	glUseProgram(renderer->shader_program.program);
 
