@@ -15,7 +15,7 @@ typedef struct chunk_t {
     i32 x;
     i32 z;
 
-    u32 *map;
+    enum block *map;
     buffer_type(cube_t) cube_buffer;
 
     GLuint vbo;
@@ -27,14 +27,17 @@ typedef struct chunk_t {
 typedef struct map_t map_t;
 
 chunk_t * chunk_create(i32 z, i32 x);
-void chunk_destroy(chunk_t *chunk);
-void chunk_free_map(chunk_t *chunk);
-void chunk_free_buffer(chunk_t *chunk);
-void chunk_gen_map(chunk_t *chunk);
-void chunk_gen_buffer(chunk_t *chunk, map_t *map);
-void chunk_load(chunk_t *chunk);
-void chunk_unload(chunk_t *chunk);
-u32 chunk_get_cube(i32 x, i32 y, i32 z, chunk_t *chunk);
-void chunk_set_cube(i32 x, i32 y, i32 z, u32 index, chunk_t *chunk);
+void chunk_destroy(chunk_t *);
+void chunk_free_map(chunk_t *);
+void chunk_free_buffer(chunk_t *);
+void chunk_gen_map(chunk_t *);
+void chunk_gen_buffer(chunk_t *, map_t *);
+void chunk_load(chunk_t *);
+void chunk_unload(chunk_t *);
+void chunk_reload(chunk_t *, map_t *);
+enum block chunk_get_cube(i32 x, i32 y, i32 z, chunk_t *);
+void chunk_set_cube(cube_t, chunk_t *);
+void chunk_remove_cube(i32 x, i32 y, i32 z, chunk_t *);
+void chunk_add_cube(cube_t cube, chunk_t *);
 
 #endif

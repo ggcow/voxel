@@ -53,9 +53,10 @@ int main(int argc, char *argv[]) {
 	player_set_chunks(player, map);
     control_key_set_defaults();
 
-	window_set_key_callback(window, key_callback, event_data);
-	window_set_mouse_move_callback(window, mouse_move_callback, event_data);
-	window_set_mouse_button_callback(window, mouse_button_callback, event_data);
+	window_set_key_callback(window, key_callback);
+	window_set_mouse_move_callback(window, mouse_move_callback);
+	window_set_mouse_button_callback(window, mouse_button_callback);
+	window->callback_data = event_data;
 
 	event_data->close_requested = &(window->close_requested);
 

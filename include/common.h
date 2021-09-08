@@ -60,7 +60,5 @@ void _deallocate(const char *filename, u32 line, void *pointer);
 #define reallocate(...) _reallocate(__FILE__, __LINE__, __VA_ARGS__)
 #define deallocate(...) _deallocate(__FILE__, __LINE__, __VA_ARGS__)
 
-#define MOD(a, b) (((a % b) + b) % b)
-
 #include "log.h"
 #endif

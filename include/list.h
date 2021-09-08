@@ -54,14 +54,12 @@ for (typeof(l->value) v = l->value; l; last = l, l = l->next, v = l->value) { \
 
 #define list_add(list, v) \
 {                          \
-typeof(*list) _node = allocate(sizeof *_node); \
+typeof(*list) _node = callocate(sizeof *_node); \
 _node->value = v; \
 if (*list) { \
-    typeof(*list) _l = *list;   \
-    for (; _l->next; _l = _l->next); \
-    _l->next = _node; \
-} else { \
-    *list = _node; \
+    _node->next = *list;\
+} \
+*list = _node; \
 }}
 
 #define list_destroy(list) \

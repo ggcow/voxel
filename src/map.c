@@ -2,6 +2,7 @@
 #include "map.h"
 
 #define FLOOR(x) ((int) floorf((f32) x))
+#define MOD(a, b) (((a%b)+b)%b)
 
 static i32 abs(i32 x)
 {
@@ -72,20 +73,39 @@ chunk_t * map_get_chunk(i32 z, i32 x, map_t *map)
                 z < 0 && x >= 0 ? 2 :
                 z <= 0 && x < 0 ? 3 :
                 z > 0 && x <= 0 ? 4 : 0;
-    if (!index) return map->chunk00;
-    return map->chunks[index-1][index&1?abs(z):abs(x)][(index&1?abs(x):abs(z))-1];
+    return index?map->chunks[index-1][index&1?abs(z):abs(x)][(index&1?abs(x):abs(z))-1]:map->chunk00;
 }
 
-cube_t * map_get_cube(i32 x, i32 y, i32 z, map_t *map)
+enum block map_get_cube(i32 x, i32 y, i32 z, map_t *map)
 {
     chunk_t *chunk = map_get_chunk(FLOOR(z / CHUNK_SIZE), FLOOR(x / CHUNK_SIZE), map);
-    u32 index = chunk_get_cube(MOD(x, CHUNK_SIZE), y, MOD(z, CHUNK_SIZE), chunk);
-    return index ? chunk->cube_buffer.data + index : NULL;
+    enum block block_type = chunk_get_cube(MOD(x, CHUNK_SIZE), y, MOD(z, CHUNK_SIZE), chunk);
+    return block_type;
 }
 
-void map_remove_cube(map_t *map, cube_t cube) {
+void map_remove_cube(i32 x, i32 y, i32 z, map_t *map) {
+    i32 cube_x = MOD(x, CHUNK_SIZE);
+    i32 cube_z = MOD(z, CHUNK_SIZE);
+    chunk_t *chunk = map_get_chunk(FLOOR(z / CHUNK_SIZE), FLOOR(x / CHUNK_SIZE), map);
+    chunk_remove_cube(cube_x, y, cube_z, chunk);
+    chunk_reload(chunk, map);
+    if (cube_x == 0) chunk_reload(map_get_chunk(chunk->z, chunk->x-1, map), map);
+    if (cube_x == 15) chunk_reload(map_get_chunk(chunk->z, chunk->x+1, map), map);
+    if (cube_z == 0) chunk_reload(map_get_chunk(chunk->z-1, chunk->x, map), map);
+    if (cube_z == 15) chunk_reload(map_get_chunk(chunk->z+1, chunk->x, map), map);
+}
 
-};
+void map_add_cube(cube_t cube, map_t *map) {
+    i32 cube_x = MOD(cube.x, CHUNK_SIZE);
+    i32 cube_z = MOD(cube.z, CHUNK_SIZE);
+    chunk_t *chunk = map_get_chunk(FLOOR(cube.z / CHUNK_SIZE), FLOOR(cube.x / CHUNK_SIZE), map);
+    chunk_add_cube((cube_t) {cube_x, cube.y, cube_z}, chunk);
+    chunk_reload(chunk, map);
+    if (cube_x == 0) chunk_reload(map_get_chunk(chunk->z, chunk->x-1, map), map);
+    if (cube_x == 15) chunk_reload(map_get_chunk(chunk->z, chunk->x+1, map), map);
+    if (cube_z == 0) chunk_reload(map_get_chunk(chunk->z-1, chunk->x, map), map);
+    if (cube_z == 15) chunk_reload(map_get_chunk(chunk->z+1, chunk->x, map), map);
+}
 
 #undef FLOOR
 
