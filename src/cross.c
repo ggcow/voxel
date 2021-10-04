@@ -1,8 +1,6 @@
 #include "cross.h"
 #include "common.h"
 
-void * memcpy(void *, const void *, unsigned long);
-
 cross_t * cross_create()
 {
     cross_t *cross = allocate(sizeof *cross);
