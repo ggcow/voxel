@@ -105,8 +105,8 @@ static cube_t get_hit_target(player_t *player, map_t *map) {
 
 static cube_t get_put_target(player_t *player, map_t *map) {
     f32 position[] = {player->eye[0], player->eye[1], player->eye[2]};
-    int precision = 10;
-    for (int i=0; i<2 * precision; i++) {
+    int precision = 100;
+    for (int i=0; i<4 * precision; i++) {
         for (int j=0; j<3; j++) {
             position[j] += player->look[j] / (float) precision;
         }
@@ -115,7 +115,7 @@ static cube_t get_put_target(player_t *player, map_t *map) {
         i32 z = (int)floor(position[2]);
         enum block type = map_get_cube(x, y, z, map);
         if (type) {
-            f32 v[] = {player->eye[0]-x-.5, player->eye[1]-y-.5, player->eye[2]-z-.5};
+            f32 v[] = {position[0]-x-.5, position[1]-y-.5, position[2]-z-.5};
             if (v[0] > v[1] && v[0] > -v[1] && v[0] > v[2] && v[0] > -v[2]) {
                 x++;
             } else if (v[0] < v[1] && v[0] < -v[1] && v[0] < v[2] && v[0] < -v[2]) {
