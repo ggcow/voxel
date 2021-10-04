@@ -80,15 +80,15 @@ void player_set_look(player_t *player, i32 dx, i32 dy) {
 		*azimuth+=2*M_PI;
 	}
 
-	player->look[2]=cos(*inclination)*cos(*azimuth);
-	player->look[0]=cos(*inclination)*sin(*azimuth);
-	player->look[1]=sin(*inclination);
+	player->look[2]=cosf(*inclination)*cosf(*azimuth);
+	player->look[0]=cosf(*inclination)*sinf(*azimuth);
+	player->look[1]=sinf(*inclination);
 }
 
 static cube_t get_hit_target(player_t *player, map_t *map) {
     f32 position[] = {player->eye[0], player->eye[1], player->eye[2]};
-    int precision = 10;
-    for (int i=0; i<2 * precision; i++) {
+    int precision = 100;
+    for (int i=0; i<4 * precision; i++) {
         for (int j=0; j<3; j++) {
             position[j] += player->look[j] / (float) precision;
         }
@@ -115,7 +115,7 @@ static cube_t get_put_target(player_t *player, map_t *map) {
         i32 z = (int)floor(position[2]);
         enum block type = map_get_cube(x, y, z, map);
         if (type) {
-            f32 v[] = {position[0]-x-.5, position[1]-y-.5, position[2]-z-.5};
+            f32 v[] = {position[0]-x-.5f, position[1]-y-.5f, position[2]-z-.5f};
             if (v[0] > v[1] && v[0] > -v[1] && v[0] > v[2] && v[0] > -v[2]) {
                 x++;
             } else if (v[0] < v[1] && v[0] < -v[1] && v[0] < v[2] && v[0] < -v[2]) {
@@ -160,8 +160,8 @@ bool player_collide(f32 eye[3], map_t *map)
 
 
     for (int i=0; i<2; i++) {
-        x[i] = floorf(eye[0] + (i?r:-r));
-        z[i] = floorf(eye[2] + (i?r:-r));
+        x[i] = (i32) floorf(eye[0] + (i?r:-r));
+        z[i] = (i32) floorf(eye[2] + (i?r:-r));
     }
 
     for (int i=0; i<4; i++) {
@@ -177,8 +177,8 @@ bool player_collide_cube(f32 eye[3], cube_t cube)
     i32 x[2], z[2];
 
     for (int i=0; i<2; i++) {
-        x[i] = floorf(eye[0] + (i?r:-r));
-        z[i] = floorf(eye[2] + (i?r:-r));
+        x[i] = (i32) floorf(eye[0] + (i?r:-r));
+        z[i] = (i32) floorf(eye[2] + (i?r:-r));
     }
 
     for (int i=0; i<4; i++) {

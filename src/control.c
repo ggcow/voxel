@@ -64,7 +64,7 @@ bool control_move(player_t *player, map_t *map, u32 keys, f32 delta) {
     f32 n = direction[0] * direction[0] + direction[1] * direction[1];
 
     if (n != 0) {
-        n = sqrt(n);
+        n = sqrtf(n);
         direction[0] /= n;
         direction[1] /= n;
     }
@@ -110,7 +110,7 @@ bool control_move(player_t *player, map_t *map, u32 keys, f32 delta) {
     collision_check(player, eye, vel, map);
 
     for (int i=0; i<3; i++) {
-        player->velocity[i] *= pow(0.9, delta * 100);
+        player->velocity[i] *= (f32) pow(0.9, delta * 100);
     }
 
     /* Only reload chunks when key released
@@ -118,8 +118,8 @@ bool control_move(player_t *player, map_t *map, u32 keys, f32 delta) {
             || ((last_keys & KEY_RENDERING_DISTANCE_MINUS) && !(keys & KEY_RENDERING_DISTANCE_MINUS));
     */
 
-    player->chunk = map_get_chunk(floorf(player->eye[2] / CHUNK_SIZE),
-                                  floorf(player->eye[0] / CHUNK_SIZE),
+    player->chunk = map_get_chunk((i32) floorf(player->eye[2] / CHUNK_SIZE),
+                                  (i32) floorf(player->eye[0] / CHUNK_SIZE),
                                   map);
 
     refresh_chunks |= player->chunk != last_chunk;
@@ -140,7 +140,7 @@ static void collision_check(player_t *player, f32 eye[3], const f32 vel[3], map_
             player->velocity[0] = ((1&i)?player->velocity:vel)[0];
             player->velocity[1] = ((2&i)?player->velocity:vel)[1];
             player->velocity[2] = ((4&i)?player->velocity:vel)[2];
-            player->gravity = !(i & 2) * 6;
+            player->gravity = (f32) !(i & 2) * 6;
             break;
         }
     }

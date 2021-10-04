@@ -12,7 +12,7 @@ typedef struct matrix_t {
 } matrix_t;
 
 
-#define matrix_identity (matrix_t) {{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}}
+#define matrix_identity ((matrix_t) {{1,0,0,0,0,1,0,0,0,0,1,0,0,0,0,1}})
 
 matrix_t matrix_perspective(f32 fov, f32 aspect, f32 near, f32 far);
 matrix_t matrix_lookAt(f32 position[3], f32 look[3], f32 up[3]);
