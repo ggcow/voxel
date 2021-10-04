@@ -6,7 +6,7 @@
 #include "player.h"
 #include "matrix.h"
 #include "cube.h"
-
+#include "cross.h"
 
 #define WIDTH 955
 #define HEIGHT 1020
@@ -20,12 +20,19 @@ int main(int argc, char *argv[]) {
 	player_t *player = NULL;
     event_data_t *event_data = NULL;
     renderer_t *renderer = NULL;
+    cross_t *cross = NULL;
 
 	window = window_create(WIDTH, HEIGHT);
 	if (!window) {
 		log_error("Window could not be created");
 		goto exit;
 	}
+
+    renderer = renderer_create();
+    if (!renderer) {
+        log_error("Renderer could not be created");
+        goto exit;
+    }
 
 	map = map_create();
 	if (!map) {
@@ -45,11 +52,12 @@ int main(int argc, char *argv[]) {
 		goto exit;
 	}
 
-	renderer = renderer_create();
-	if (!renderer) {
-		log_error("Renderer could not be created");
-		goto exit;
-	}
+    cross = cross_create();
+    if (!cross) {
+        log_error("Cross could not be created");
+        goto exit;
+    }
+
 	player_set_chunks(player, map);
     control_key_set_defaults();
 
@@ -75,15 +83,17 @@ int main(int argc, char *argv[]) {
         mvp = matrix_multiply(perspective, view);
 
 		renderer_draw(renderer, player, &mvp);
+        cross_draw(cross);
 		window_swap(window);
 	}
 
 
     exit:
-	if (renderer) renderer_destroy(renderer);
+    if (cross) cross_destroy(cross);
 	if (event_data)	event_data_destroy(event_data);
 	if (player)	player_destroy(player);
 	if (map) map_destroy(map);
+    if (renderer) renderer_destroy(renderer);
 	if (window)	window_destroy(window);
 	return 0;
 }

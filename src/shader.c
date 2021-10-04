@@ -1,5 +1,6 @@
 #include "shader.h"
 #include "common.h"
+#include "string.h"
 
 static GLuint create_shader(GLenum shader_type, const GLchar *shader_source);
 
@@ -45,20 +46,37 @@ static GLuint create_shader(GLenum shader_type, const GLchar *shader_source) {
     return shader;
 }
 
-shader_program_t shader_program_make(const GLchar *vertex_shader_source,
-                                     const GLchar *fragment_shader_source) {
+shader_program_t shader_program_make(const char *vertex_shader_rel_path,
+                                     const char *fragment_shader_rel_path) {
     GLuint program = 0;
     GLuint fragment_shader = 0;
     GLuint vertex_shader = 0;
-    vertex_shader = create_shader(GL_VERTEX_SHADER, vertex_shader_source);
+
+    char vertex_shader_path[200];
+    char fragment_shader_path[200];
+    strcpy(vertex_shader_path, ROOT_FOLDER);
+    strcpy(fragment_shader_path, ROOT_FOLDER);
+    strcat(vertex_shader_path, vertex_shader_rel_path);
+    strcat(fragment_shader_path, fragment_shader_rel_path);
+    char *vertex_shader_code = shader_load_from_file(vertex_shader_path);
+    char *fragment_shader_code = shader_load_from_file(fragment_shader_path);
+
+    if (!*vertex_shader_code || !*fragment_shader_code) {
+        goto error;
+    }
+
+    vertex_shader = create_shader(GL_VERTEX_SHADER, vertex_shader_code);
     if (!vertex_shader) {
         goto error;
     }
 
-    fragment_shader = create_shader(GL_FRAGMENT_SHADER, fragment_shader_source);
+    fragment_shader = create_shader(GL_FRAGMENT_SHADER, fragment_shader_code);
     if (!fragment_shader) {
         goto error;
     }
+
+    deallocate(vertex_shader_code);
+    deallocate(fragment_shader_code);
 
     program = glCreateProgram();
     if (!program) {
@@ -92,6 +110,8 @@ shader_program_t shader_program_make(const GLchar *vertex_shader_source,
 
 
     error:
+    deallocate(vertex_shader_code);
+    deallocate(fragment_shader_code);
     if (fragment_shader) glDeleteShader(fragment_shader);
     if (vertex_shader) glDeleteShader(vertex_shader);
     return (shader_program_t) {.program=0};

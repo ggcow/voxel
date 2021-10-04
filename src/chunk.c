@@ -31,6 +31,7 @@ void chunk_destroy(chunk_t *chunk)
 {
     chunk_free_buffer(chunk);
     chunk_free_map(chunk);
+    glDeleteBuffers(1, &chunk->vbo);
     deallocate(chunk);
 }
 
@@ -119,7 +120,7 @@ void chunk_load(chunk_t *chunk)
     chunk->loaded = TRUE;
     glBindBuffer(GL_ARRAY_BUFFER, chunk->vbo);
     glBufferData(GL_ARRAY_BUFFER,
-                 sizeof(GLint) * (chunk->data_buffer.index),
+                 (GLsizeiptr) sizeof(GLint) * (chunk->data_buffer.index),
                  chunk->data_buffer.data,
                  GL_STATIC_DRAW);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
