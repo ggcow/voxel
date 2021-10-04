@@ -99,7 +99,7 @@ void map_add_cube(cube_t cube, map_t *map) {
     i32 cube_x = MOD(cube.x, CHUNK_SIZE);
     i32 cube_z = MOD(cube.z, CHUNK_SIZE);
     chunk_t *chunk = map_get_chunk(FLOOR(cube.z / CHUNK_SIZE), FLOOR(cube.x / CHUNK_SIZE), map);
-    chunk_add_cube((cube_t) {cube_x, cube.y, cube_z}, chunk);
+    chunk_add_cube((cube_t) {cube_x, cube.y, cube_z, BLOCK_DIRT}, chunk);
     chunk_reload(chunk, map);
     if (cube_x == 0) chunk_reload(map_get_chunk(chunk->z, chunk->x-1, map), map);
     if (cube_x == 15) chunk_reload(map_get_chunk(chunk->z, chunk->x+1, map), map);
