@@ -71,7 +71,7 @@ static bool setup(renderer_t *renderer)
     glVertexAttribIPointer(0, 2, GL_INT, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glClearColor(0, 0, 0, 0);
+	glClearColor(.5f, .8f, .9f, 1);
 
 	texture_setup();
     GLint texture_count_location = glGetUniformLocation(renderer->shader_program.program, "texture_count");

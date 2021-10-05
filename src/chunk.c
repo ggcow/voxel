@@ -2,6 +2,7 @@
 #include "opengl.h"
 #include "texture.h"
 #include <math.h>
+#include "noise.h"
 #include <map.h>
 
 #define ABS(x) (x>0?x:-x)
@@ -13,9 +14,10 @@ static bool equation(i32 x, i32 y, i32 z)
 //    x-=8;
 //    z-=8;
 //    f32 e = 30*sin(M_PI*sqrt(x*x+z*z)/85);
-    return MAXX(x, y, z) <=4;
+//    return MAXX(x, y, z) <=4;
 //    return y  <= fabsf(e);
 //    return y<0;
+    return y <= (int) (perlin2d((float) ABS(x), (float) ABS(z), .1f, 10) * 10);
 }
 
 chunk_t * chunk_create(i32 z, i32 x)
