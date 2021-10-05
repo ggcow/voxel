@@ -93,21 +93,21 @@ void chunk_gen_buffer(chunk_t *chunk, map_t *map)
 
         for (int i=-1; i<2; i+=2) {
             if (!map_get_cube(x + i, y, z, map)) {
-                buffer_push(chunk->data_buffer, x +(i+1)/2);
+                buffer_push(chunk->data_buffer, x)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, y);
-                buffer_push(chunk->data_buffer, z +(i+1)/2);
+                buffer_push(chunk->data_buffer, z)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, (i<0?0:3) | grass_side);
             }
             if (!map_get_cube(x, y + i, z, map)) {
                 buffer_push(chunk->data_buffer, x);
-                buffer_push(chunk->data_buffer, y + (i+1)/2);
-                buffer_push(chunk->data_buffer, z +(i+1)/2);
+                buffer_push(chunk->data_buffer, y)// + (i+1)/2);
+                buffer_push(chunk->data_buffer, z)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, i<0?1:4 | TEXTURE_TOP<<3);
             }
             if (!map_get_cube(x, y, z + i, map)) {
-                buffer_push(chunk->data_buffer, x -(i-1)/2);
+                buffer_push(chunk->data_buffer, x)// -(i-1)/2);
                 buffer_push(chunk->data_buffer, y);
-                buffer_push(chunk->data_buffer, z +(i+1)/2);
+                buffer_push(chunk->data_buffer, z)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, (i<0?2:5) | grass_side);
             }
         }

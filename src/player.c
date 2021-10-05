@@ -85,7 +85,7 @@ void player_set_look(player_t *player, i32 dx, i32 dy) {
 	player->look[1]=sinf(*inclination);
 }
 
-static cube_t get_hit_target(player_t *player, map_t *map) {
+cube_t player_get_hit_target(player_t *player, map_t *map) {
     f32 position[] = {player->eye[0], player->eye[1], player->eye[2]};
     int precision = 100;
     for (int i=0; i<4 * precision; i++) {
@@ -140,9 +140,8 @@ static cube_t get_put_target(player_t *player, map_t *map) {
 }
 
 void player_hit_cube(player_t *player, map_t *map) {
-    cube_t cube = get_hit_target(player, map);
-    if (cube.type) {
-        map_remove_cube(cube.x, cube.y, cube.z, map);
+    if (player->target.type) {
+        map_remove_cube(player->target.x, player->target.y, player->target.z, map);
     }
 }
 

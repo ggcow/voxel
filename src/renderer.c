@@ -14,6 +14,9 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp)
     GLint eyeID = glGetUniformLocation(renderer->shader_program.program, "eye");
     glUniform3fv(eyeID, 1, player->eye);
 
+    GLint targetID = glGetUniformLocation(renderer->shader_program.program, "target");
+    glUniform3iv(targetID, 1, &player->target.x);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(renderer->vao);

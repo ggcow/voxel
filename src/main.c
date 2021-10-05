@@ -82,6 +82,8 @@ int main(int argc, char *argv[]) {
         view = matrix_lookAt(player->eye, player->look, (f32[3]){0,1,0});
         mvp = matrix_multiply(perspective, view);
 
+        player->target = player_get_hit_target(player, map);
+
 		renderer_draw(renderer, player, &mvp);
         cross_draw(cross);
 		window_swap(window);
