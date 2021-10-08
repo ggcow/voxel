@@ -15,7 +15,7 @@ typedef struct window_t {
 
     void (*mouse_button_callback)(struct window_t *, i32, i32, u8);
 	void (*mouse_move_callback)(struct window_t *, i32, i32);
-	void (*key_callback)(struct window_t *, SDL_KeyCode , enum state);
+	void (*key_callback)(struct window_t *, SDL_Keycode , enum state);
     event_data_t *callback_data;
 
 	f64 time_s;
@@ -41,7 +41,7 @@ void window_set_mouse_move_callback(
 
 void window_set_key_callback(
 	window_t *window,
-	void (*callback)(window_t  *, SDL_KeyCode, enum state)
+	void (*callback)(window_t  *, SDL_Keycode, enum state)
 );
 
 void window_set_mouse_button_callback(

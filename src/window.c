@@ -130,7 +130,7 @@ void window_set_mouse_move_callback(window_t *window, void (*callback)(window_t 
 }
 
 
-void window_set_key_callback(window_t *window, void (*callback)(window_t *, SDL_KeyCode , enum state))
+void window_set_key_callback(window_t *window, void (*callback)(window_t *, SDL_Keycode , enum state))
 {
 	window->key_callback = callback;
 }

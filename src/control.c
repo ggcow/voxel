@@ -18,7 +18,7 @@ void control_key_set_defaults(void) {
     KEY(KEY_RENDERING_DISTANCE_MINUS) = SDLK_m;
 }
 
-enum control_key_t control_key_from_sdl_keycode(SDL_KeyCode key_code) {
+enum control_key_t control_key_from_sdl_keycode(SDL_Keycode key_code) {
     for (int i=0; i<NUMBER_OF_CONTROL_KEYS; i++) {
         if (control_key_map[i] == key_code) {
             return (enum control_key_t) 1 << i;

@@ -19,7 +19,7 @@ void mouse_button_callback(window_t *window, i32 dx, i32 dy, u8 button) {
     }
 }
 
-void key_callback(window_t*window, SDL_KeyCode key_code, enum state key_state) {
+void key_callback(window_t*window, SDL_Keycode key_code, enum state key_state) {
     event_data_t *event_data = window->callback_data;
     enum control_key_t key = control_key_from_sdl_keycode(key_code);
     if (key != KEY_UNKNOWN) {
