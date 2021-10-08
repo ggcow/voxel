@@ -2,6 +2,7 @@
 #include "opengl.h"
 #include "texture.h"
 #include <math.h>
+#include "noise.h"
 #include <map.h>
 
 #define ABS(x) (x>0?x:-x)
@@ -13,9 +14,10 @@ static bool equation(i32 x, i32 y, i32 z)
 //    x-=8;
 //    z-=8;
 //    f32 e = 30*sin(M_PI*sqrt(x*x+z*z)/85);
-    return MAXX(x, y, z) <=4;
+//    return MAXX(x, y, z) <=4;
 //    return y  <= fabsf(e);
 //    return y<0;
+    return y <= (int) (perlin2d((float) ABS(x), (float) ABS(z), .1f, 10) * 10);
 }
 
 chunk_t * chunk_create(i32 z, i32 x)
@@ -93,21 +95,21 @@ void chunk_gen_buffer(chunk_t *chunk, map_t *map)
 
         for (int i=-1; i<2; i+=2) {
             if (!map_get_cube(x + i, y, z, map)) {
-                buffer_push(chunk->data_buffer, x +(i+1)/2);
+                buffer_push(chunk->data_buffer, x)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, y);
-                buffer_push(chunk->data_buffer, z +(i+1)/2);
+                buffer_push(chunk->data_buffer, z)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, (i<0?0:3) | grass_side);
             }
             if (!map_get_cube(x, y + i, z, map)) {
                 buffer_push(chunk->data_buffer, x);
-                buffer_push(chunk->data_buffer, y + (i+1)/2);
-                buffer_push(chunk->data_buffer, z +(i+1)/2);
+                buffer_push(chunk->data_buffer, y)// + (i+1)/2);
+                buffer_push(chunk->data_buffer, z)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, i<0?1:4 | TEXTURE_TOP<<3);
             }
             if (!map_get_cube(x, y, z + i, map)) {
-                buffer_push(chunk->data_buffer, x -(i-1)/2);
+                buffer_push(chunk->data_buffer, x)// -(i-1)/2);
                 buffer_push(chunk->data_buffer, y);
-                buffer_push(chunk->data_buffer, z +(i+1)/2);
+                buffer_push(chunk->data_buffer, z)// +(i+1)/2);
                 buffer_push(chunk->data_buffer, (i<0?2:5) | grass_side);
             }
         }

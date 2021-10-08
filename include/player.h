@@ -21,6 +21,8 @@ typedef struct player_t {
 
     f32 rendering_distance;
 	plist_t chunk_list;
+
+    cube_t target;
 } player_t;
 
 
@@ -35,5 +37,7 @@ void player_put_cube(player_t *, map_t *);
 
 bool player_collide(f32 eye[3], map_t *);
 bool player_collide_cube(f32 eye[3], cube_t);
+
+cube_t player_get_hit_target(player_t *, map_t *);
 
 #endif

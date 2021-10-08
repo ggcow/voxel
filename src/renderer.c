@@ -14,6 +14,9 @@ void renderer_draw(renderer_t *renderer, player_t *player, matrix_t *mvp)
     GLint eyeID = glGetUniformLocation(renderer->shader_program.program, "eye");
     glUniform3fv(eyeID, 1, player->eye);
 
+    GLint targetID = glGetUniformLocation(renderer->shader_program.program, "target");
+    glUniform3iv(targetID, 1, &player->target.x);
+
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     glBindVertexArray(renderer->vao);
@@ -68,7 +71,7 @@ static bool setup(renderer_t *renderer)
     glVertexAttribIPointer(0, 2, GL_INT, 0, NULL);
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	glClearColor(0, 0, 0, 0);
+	glClearColor(.5f, .8f, .9f, 1);
 
 	texture_setup();
     GLint texture_count_location = glGetUniformLocation(renderer->shader_program.program, "texture_count");
