@@ -13,6 +13,7 @@ uniform uint texture_count;
 const float ambient = .1;
 in vec3 light_source;
 
+
 void main() {
 	color = texture2D(texture_map, vec2(uv.x, (uv.y + texture_index) / texture_count));
 	if (targeted == 1)

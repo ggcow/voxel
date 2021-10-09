@@ -85,10 +85,12 @@ void event_poll_events(window_t *window, matrix_t *perspective) {
                     UP
             );
         } else if (event.type == SDL_MOUSEMOTION && window->mouse_move_callback) {
+            int x, y;
+            SDL_GetRelativeMouseState(&x, &y);
             window->mouse_move_callback(
                 window,
-                event.motion.xrel,
-                event.motion.yrel
+                x, //event.motion.xrel,
+                y //event.motion.yrel
             );
         } else if (event.type == SDL_MOUSEBUTTONDOWN && window->mouse_button_callback) {
             window->mouse_button_callback(
