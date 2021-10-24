@@ -52,8 +52,8 @@ shader_program_t shader_program_make(const char *vertex_shader_rel_path,
     GLuint fragment_shader = 0;
     GLuint vertex_shader = 0;
 
-    char vertex_shader_path[200];
-    char fragment_shader_path[200];
+    char vertex_shader_path[500];
+    char fragment_shader_path[500];
     strcpy(vertex_shader_path, ROOT_FOLDER);
     strcpy(fragment_shader_path, ROOT_FOLDER);
     strcat(vertex_shader_path, vertex_shader_rel_path);
